@@ -780,7 +780,7 @@
 
 <script>
     // --------------------- قاعدة البيانات المشتركة ---------------------
-    const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
+    const JSONBLOB_ID_FIXED = '019fc140-2673-725f-b450-0369fee44f92';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 5000;
     function getBlobUrl() {
@@ -816,6 +816,15 @@
                 cache: 'no-store',
                 headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' }
             });
+            if (res.status === 404) {
+                console.error('معرّف قاعدة البيانات (' + JSONBLOB_ID + ') غير موجود على jsonblob.com');
+                setSyncStatus(false, 'missing');
+                if (!blobRecoveryTried) {
+                    blobRecoveryTried = true;
+                    await recoverBrokenBlob();
+                }
+                return false;
+            }
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
             groups = Array.isArray(data.groups) && data.groups.length ? data.groups : defaultGroups;
@@ -828,18 +837,49 @@
             return true;
         } catch (err) {
             console.error('تعذر تحميل البيانات:', err);
-            setSyncStatus(false);
+            setSyncStatus(false, 'network');
             return false;
         }
     }
 
+    // إذا كان معرّف قاعدة البيانات المضمّن في الملف غير موجود أصلاً (اتمسح أو غلط)،
+    // ننشئ قاعدة بيانات جديدة تلقائياً بأول بيانات موجودة على هذا الجهاز، ونعرض
+    // كودها بشكل واضح على الشاشة الرئيسية عشان يتبعت في الشات فيتم تثبيته
+    // كمعرّف ثابت في كل نسخ الملف على كل الأجهزة.
+    let blobRecoveryTried = false;
+    async function recoverBrokenBlob() {
+        try {
+            const res = await fetch('https://jsonblob.com/api/jsonBlob', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ groups: groups.length ? groups : defaultGroups, bookings })
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const loc = res.headers.get('Location') || res.headers.get('location') || '';
+            const id = loc.split('/').pop();
+            if (!id) throw new Error('لم يتم استلام معرّف جديد');
+            JSONBLOB_ID = id;
+            localStorage.setItem('bookingBlobId', id);
+            const el = document.getElementById('syncStatus');
+            if (el) {
+                el.innerHTML = '🟡 تم إنشاء قاعدة بيانات جديدة مؤقتاً — انسخ هذا الكود وابعته في الشات فوراً عشان يتثبت في كل الأجهزة: <b style="direction:ltr; display:inline-block; user-select:all;">' + id + '</b>';
+                el.style.color = '#8a6d00';
+            }
+        } catch (e) {
+            console.error('فشل إنشاء قاعدة بيانات بديلة:', e);
+        }
+    }
+
     // --------------------- حالة الاتصال بقاعدة البيانات ---------------------
-    function setSyncStatus(ok) {
+    function setSyncStatus(ok, reason) {
         const el = document.getElementById('syncStatus');
         if (!el) return;
         if (ok) {
             el.textContent = '🟢 متصل بقاعدة البيانات المشتركة — آخر تحديث: ' + new Date().toLocaleTimeString('ar-EG');
             el.style.color = '#0a8a5f';
+        } else if (reason === 'missing') {
+            el.textContent = '🔴 قاعدة البيانات المشتركة الحالية غير موجودة (تم حذفها أو الكود غير صحيح). جارٍ محاولة الإصلاح تلقائياً...';
+            el.style.color = '#d1354a';
         } else {
             el.textContent = '🔴 تعذر الاتصال بقاعدة البيانات المشتركة! البيانات المعروضة قد تكون قديمة. تحقق من الإنترنت.';
             el.style.color = '#d1354a';
