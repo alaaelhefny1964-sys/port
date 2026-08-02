@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دفتر تسجيل الحجوزات - مستر علاء الحفني</title>
+    <!-- خطوط جوجل -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Cairo', sans-serif;
             background: linear-gradient(145deg, #fff9e6, #fef3d7);
@@ -18,6 +24,8 @@
             flex-direction: column;
             align-items: center;
         }
+
+        /* النقاط الزخرفية الملونة */
         .decorative-dots {
             display: flex;
             gap: 18px;
@@ -38,6 +46,7 @@
         .dot4 { background: #EF476F; }
         .dot5 { background: #118AB2; }
 
+        /* الترحيب */
         .welcome-banner {
             background: #2d1b3d;
             padding: 16px 40px;
@@ -59,17 +68,20 @@
             margin: 0;
         }
 
+        /* الدفتر الرئيسي */
         .notebook {
             max-width: 820px;
             width: 100%;
             background: #fffdf7;
-            border-radius: 30px;
+            border-radius: 30px 30px 30px 30px;
             padding: 30px 35px 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
             border: 1px solid rgba(255, 215, 140, 0.4);
             position: relative;
             margin-bottom: 30px;
         }
+
+        /* هامش دفتر بتدرج وردي-بنفسجي */
         .notebook::before {
             content: '';
             position: absolute;
@@ -81,6 +93,7 @@
             border-radius: 10px;
             opacity: 0.5;
         }
+
         .notebook-header {
             text-align: center;
             margin-bottom: 28px;
@@ -88,6 +101,7 @@
             padding-bottom: 18px;
             position: relative;
         }
+
         .notebook-header h1 {
             font-size: 2.5rem;
             font-weight: 800;
@@ -96,6 +110,7 @@
             margin-bottom: 6px;
             text-shadow: 0 2px 8px rgba(95, 45, 138, 0.15);
         }
+
         .notebook-header .subhead {
             font-size: 1.1rem;
             font-weight: 600;
@@ -105,7 +120,11 @@
             background-clip: text;
         }
 
-        .form-group { margin-bottom: 20px; }
+        /* الحقول */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
         .form-group label {
             display: block;
             font-weight: 700;
@@ -114,7 +133,9 @@
             font-size: 1rem;
             letter-spacing: 0.3px;
         }
-        .form-group input, .form-group select {
+
+        .form-group input, 
+        .form-group select {
             width: 100%;
             padding: 14px 18px;
             border: 2px solid #ece1d3;
@@ -125,19 +146,25 @@
             transition: 0.25s;
             color: #2d1b3d;
         }
-        .form-group input:focus, .form-group select:focus {
+
+        .form-group input:focus,
+        .form-group select:focus {
             border-color: #9B5DE5;
             outline: none;
             box-shadow: 0 0 0 5px rgba(155, 93, 229, 0.15);
             background: #ffffff;
         }
+
         .form-row {
             display: flex;
             flex-wrap: wrap;
             gap: 18px;
         }
-        .form-row .form-group { flex: 1 1 200px; }
+        .form-row .form-group {
+            flex: 1 1 200px;
+        }
 
+        /* زرار التسجيل */
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -154,11 +181,13 @@
             margin-top: 12px;
             font-family: 'Cairo', sans-serif;
         }
+
         .btn-primary:hover {
             transform: scale(1.01);
             box-shadow: 0 14px 28px -8px #9B5DE5;
         }
 
+        /* شاشة التأكيد */
         .confirmation-box {
             background: #e1f7f0;
             border-radius: 28px;
@@ -170,7 +199,11 @@
             text-align: center;
             box-shadow: 0 0 0 3px #fff, 0 8px 20px rgba(6, 214, 160, 0.2);
         }
-        .confirmation-box.active { display: block; }
+
+        .confirmation-box.active {
+            display: block;
+        }
+
         .stamp {
             display: inline-block;
             background: #06D6A0;
@@ -185,17 +218,20 @@
             background: linear-gradient(145deg, #06D6A0, #0bbf8a);
             text-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
+
         .confirmation-box p {
             font-size: 1.2rem;
             font-weight: 600;
             color: #0a4b3a;
             margin: 12px 0;
         }
+
         .confirmation-box .small-note {
             font-weight: 400;
             color: #1f6b56;
         }
 
+        /* زرار واتساب */
         .whatsapp-btn {
             display: inline-block;
             background: linear-gradient(135deg, #25D366, #128C7E);
@@ -211,10 +247,12 @@
             margin-top: 18px;
             font-family: 'Cairo', sans-serif;
         }
+
         .whatsapp-btn:hover {
             transform: scale(1.02);
             box-shadow: 0 12px 28px rgba(37, 211, 102, 0.4);
         }
+
         .action-group {
             display: flex;
             flex-wrap: wrap;
@@ -222,6 +260,7 @@
             justify-content: center;
             margin-top: 10px;
         }
+
         .copy-link-btn {
             background: #e9e0f5;
             color: #4a2b5e;
@@ -234,8 +273,11 @@
             transition: 0.2s;
             font-family: 'Cairo', sans-serif;
         }
-        .copy-link-btn:hover { background: #d7c7ec; }
+        .copy-link-btn:hover {
+            background: #d7c7ec;
+        }
 
+        /* قسم إدارة المجموعات */
         .groups-manager {
             background: #faf3ee;
             border-radius: 24px;
@@ -243,18 +285,21 @@
             margin: 30px 0 20px;
             border: 1px solid #f0ddd0;
         }
+
         .groups-manager h3 {
             color: #5f2d8a;
             font-weight: 700;
             font-size: 1.2rem;
             margin-bottom: 12px;
         }
+
         .group-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin: 12px 0;
         }
+
         .group-tag {
             background: #ffffff;
             padding: 8px 16px 8px 12px;
@@ -267,6 +312,7 @@
             color: #3d2a4b;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
+
         .group-tag .del-group {
             background: #ffd8d8;
             border: none;
@@ -286,16 +332,6 @@
             background: #ffb3b3;
             transform: scale(1.1);
         }
-        .group-tag .lock-toggle {
-            background: none;
-            border: none;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 0 4px;
-            transition: 0.2s;
-        }
-        .group-tag .lock-toggle:hover { transform: scale(1.2); }
-        .group-tag.locked { border-color: #EF476F; background: #fff0f0; }
 
         .add-group-form {
             display: flex;
@@ -322,9 +358,14 @@
             transition: 0.2s;
             font-family: 'Cairo', sans-serif;
         }
-        .add-group-form button:hover { background: #7d44b8; }
-        .add-group-form input[type="number"] { flex: 0 0 130px; }
+        .add-group-form button:hover {
+            background: #7d44b8;
+        }
+        .add-group-form input[type="number"] {
+            flex: 0 0 130px;
+        }
 
+        /* نافذة المجموعات والمقاعد */
         .group-window-card {
             background: #fcf8f2;
             border-radius: 20px;
@@ -333,8 +374,10 @@
             border-right: 6px solid #06D6A0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .group-window-card.full { border-right-color: #EF476F; background: #fdf1f1; }
-        .group-window-card.locked-manual { border-right-color: #f39c12; background: #fff8e8; }
+        .group-window-card.full {
+            border-right-color: #EF476F;
+            background: #fdf1f1;
+        }
         .gw-header {
             display: flex;
             justify-content: space-between;
@@ -343,7 +386,11 @@
             gap: 8px;
             margin-bottom: 10px;
         }
-        .gw-name { font-size: 1.1rem; font-weight: 800; color: #2d1b3d; }
+        .gw-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #2d1b3d;
+        }
         .gw-count {
             font-size: 0.95rem;
             font-weight: 700;
@@ -355,10 +402,6 @@
         .group-window-card.full .gw-count {
             color: #b0003a;
             background: #ffe1e8;
-        }
-        .group-window-card.locked-manual .gw-count {
-            color: #b7791f;
-            background: #fff0d0;
         }
         .gw-progress {
             width: 100%;
@@ -377,10 +420,11 @@
         .group-window-card.full .gw-progress-bar {
             background: linear-gradient(135deg, #EF476F, #d63d5f);
         }
-        .group-window-card.locked-manual .gw-progress-bar {
-            background: linear-gradient(135deg, #f39c12, #d68910);
+        .gw-students {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .gw-students { display: flex; flex-direction: column; gap: 6px; }
         .gw-student {
             font-size: 0.9rem;
             color: #3d2a4b;
@@ -395,7 +439,11 @@
             padding: 10px 0;
         }
 
-        .bookings-section { margin-top: 30px; }
+        /* جدول الحجوزات */
+        .bookings-section {
+            margin-top: 30px;
+        }
+
         .bookings-section h3 {
             color: #3d2a4b;
             font-weight: 700;
@@ -417,7 +465,10 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
             transition: 0.2s;
         }
-        .booking-card:hover { background: #f9f2ea; }
+        .booking-card:hover {
+            background: #f9f2ea;
+        }
+
         .booking-card .student-name {
             font-size: 1.2rem;
             font-weight: 800;
@@ -442,32 +493,6 @@
             color: #7a5e7e;
             margin-top: 6px;
         }
-        .booking-card .actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        .booking-card .actions button {
-            border: none;
-            border-radius: 30px;
-            padding: 4px 16px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Cairo', sans-serif;
-        }
-        .booking-card .actions .edit-btn {
-            background: #FFD166;
-            color: #5f2d8a;
-        }
-        .booking-card .actions .edit-btn:hover { background: #f7c04a; }
-        .booking-card .actions .delete-btn {
-            background: #EF476F;
-            color: white;
-        }
-        .booking-card .actions .delete-btn:hover { background: #d63d5f; }
 
         .no-bookings {
             color: #7a5e7e;
@@ -476,10 +501,12 @@
             font-weight: 600;
         }
 
+        /* زر لوحة التحكم */
         .admin-btn-container {
             text-align: center;
             margin: 15px 0 5px;
         }
+
         .admin-btn {
             background: linear-gradient(135deg, #2d1b3d, #5f2d8a);
             color: white;
@@ -493,11 +520,13 @@
             font-family: 'Cairo', sans-serif;
             box-shadow: 0 4px 12px rgba(95, 45, 138, 0.3);
         }
+
         .admin-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(95, 45, 138, 0.4);
         }
 
+        /* نافذة عرض الحجوزات (Modal) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -512,7 +541,11 @@
             align-items: center;
             padding: 20px;
         }
-        .modal-overlay.active { display: flex; }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
         .modal-content {
             background: #fffdf7;
             border-radius: 30px;
@@ -525,6 +558,7 @@
             animation: fadeSlide 0.4s ease;
             position: relative;
         }
+
         .modal-content h2 {
             color: #5f2d8a;
             font-weight: 800;
@@ -532,12 +566,14 @@
             margin-bottom: 5px;
             text-align: center;
         }
+
         .modal-content .subtitle {
             text-align: center;
             color: #7a5e7e;
             margin-bottom: 20px;
             font-size: 0.95rem;
         }
+
         .modal-close {
             position: absolute;
             top: 15px;
@@ -556,10 +592,12 @@
             color: #b0003a;
             font-weight: 800;
         }
+
         .modal-close:hover {
             background: #ffb3b3;
             transform: scale(1.1);
         }
+
         .modal-booking-card {
             background: #fcf8f2;
             border-radius: 16px;
@@ -568,11 +606,13 @@
             border-right: 5px solid #9B5DE5;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
+
         .modal-booking-card .m-name {
             font-weight: 800;
             font-size: 1.1rem;
             color: #2d1b3d;
         }
+
         .modal-booking-card .m-details {
             font-size: 0.9rem;
             color: #3f2d4a;
@@ -581,23 +621,27 @@
             flex-wrap: wrap;
             gap: 4px 16px;
         }
+
         .modal-booking-card .m-details span {
             background: #ede5f0;
             padding: 0 10px;
             border-radius: 20px;
             line-height: 1.7;
         }
+
         .modal-booking-card .m-time {
             font-size: 0.75rem;
             color: #7a5e7e;
             margin-top: 4px;
         }
+
         .modal-empty {
             text-align: center;
             color: #7a5e7e;
             padding: 30px 0;
             font-weight: 600;
         }
+
         .modal-stats {
             display: flex;
             flex-wrap: wrap;
@@ -605,6 +649,7 @@
             justify-content: center;
             margin: 15px 0 20px;
         }
+
         .modal-stats .stat-item {
             background: #ede5f0;
             padding: 6px 20px;
@@ -613,10 +658,12 @@
             color: #3d2a4b;
             font-size: 0.9rem;
         }
+
         .modal-stats .stat-item span {
             color: #5f2d8a;
             font-size: 1.1rem;
         }
+
         .modal-export-btn {
             display: inline-block;
             background: #06D6A0;
@@ -631,43 +678,10 @@
             font-family: 'Cairo', sans-serif;
             margin-top: 10px;
         }
+
         .modal-export-btn:hover {
             background: #05b88a;
             transform: scale(1.02);
-        }
-
-        #syncStatus {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(45, 27, 61, 0.9);
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            z-index: 999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            direction: ltr;
-            text-align: center;
-        }
-        #syncStatus .dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-left: 8px;
-            animation: pulse 1.5s infinite;
-        }
-        #syncStatus .dot.green { background: #06D6A0; }
-        #syncStatus .dot.red { background: #EF476F; }
-        #syncStatus .dot.yellow { background: #FFD166; }
-        @keyframes pulse {
-            0% { opacity: 0.4; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
-            100% { opacity: 0.4; transform: scale(0.8); }
         }
 
         @keyframes fadeSlide {
@@ -675,6 +689,7 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* استجابة */
         @media (max-width: 600px) {
             .notebook { padding: 20px 15px; }
             .notebook-header h1 { font-size: 1.9rem; }
@@ -686,6 +701,7 @@
 </head>
 <body>
 
+<!-- النقاط الزخرفية -->
 <div class="decorative-dots">
     <span class="dot1"></span>
     <span class="dot2"></span>
@@ -694,10 +710,12 @@
     <span class="dot5"></span>
 </div>
 
+<!-- الترحيب -->
 <div class="welcome-banner">
     <h2>مستر / علاء الحفني يرحب بكم</h2>
 </div>
 
+<!-- الدفتر الرئيسي -->
 <div class="notebook" id="notebookContainer">
 
     <div class="notebook-header">
@@ -705,6 +723,7 @@
         <div class="subhead">✧ المرحلة الدراسية · المجموعة · بيانات الطالب ✧</div>
     </div>
 
+    <!-- نموذج الحجز -->
     <form id="bookingForm">
         <div class="form-row">
             <div class="form-group">
@@ -743,15 +762,19 @@
         <button type="submit" class="btn-primary">تسجيل الحجز</button>
     </form>
 
+    <!-- شاشة التأكيد -->
     <div id="confirmationBox" class="confirmation-box">
         <div class="stamp">✓ تم التسجيل</div>
         <p>تم تسجيل بياناتك بالكامل، برجاء انتظار تفعيل الحجز</p>
         <div class="action-group">
-            <a href="#" id="whatsappShareBtn" class="whatsapp-btn" target="_blank">📱 إرسال إشعار للإدارة على واتساب</a>
+            <a href="#" id="whatsappShareBtn" class="whatsapp-btn" target="_blank">
+                📱 إرسال إشعار للإدارة على واتساب
+            </a>
             <button id="copyLinkBtn" class="copy-link-btn">📋 نسخ رابط الحجز</button>
         </div>
     </div>
 
+    <!-- إدارة المجموعات -->
     <div class="groups-manager" id="groupsManager">
         <h3>📚 إدارة المجموعات</h3>
         <div id="groupTagsContainer" class="group-tags"></div>
@@ -760,44 +783,53 @@
             <input type="number" id="newGroupCapacityInput" placeholder="الحد الأقصى" min="1" value="30">
             <button id="addGroupBtn">➕ إضافة</button>
         </div>
-        <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">🔒 يمكنك قفل أي مجموعة يدوياً من زر القفل 🔓/🔒 بجانب كل مجموعة (للمدير فقط).</p>
+        <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">المجموعات المضافة تظهر في قائمة الحجز. الحد الأقصى الافتراضي 30 طالب، وتُقفل المجموعة تلقائياً عند اكتمال العدد.</p>
     </div>
 
+    <!-- عرض الحجوزات المسجلة -->
     <div class="bookings-section" id="bookingsSection">
         <h3>📋 عرض الحجوزات المسجّلة</h3>
         <div id="bookingsList"></div>
     </div>
 
+    <!-- زر لوحة التحكم -->
     <div class="admin-btn-container">
         <button class="admin-btn" id="adminPanelBtn">🔐 لوحة التحكم - المشرف</button>
         <button class="admin-btn" id="groupsWindowBtn" style="background:linear-gradient(135deg, #06D6A0, #0bbf8a);">📚 عرض المجموعات والمقاعد</button>
     </div>
 </div>
 
-<!-- Modal لوحة التحكم -->
+<!-- نافذة عرض الحجوزات (Modal) -->
 <div class="modal-overlay" id="adminModal">
     <div class="modal-content">
         <button class="modal-close" id="modalCloseBtn">✕</button>
         <h2>📊 لوحة تحكم المشرف</h2>
-        <p class="subtitle">جميع الحجوزات المسجلة من جميع الأجهزة</p>
+        <p class="subtitle">جميع الحجوزات المسجلة من جميع الأجهزة (تتحدث تلقائياً كل بضع ثوانٍ)</p>
+        
         <div class="modal-stats" id="modalStats">
             <div class="stat-item">📌 إجمالي الحجوزات: <span id="totalCount">0</span></div>
             <div class="stat-item">📚 عدد المجموعات: <span id="groupCount">0</span></div>
         </div>
+        
         <div id="modalBookingsList"></div>
+        
         <div style="text-align:center; margin-top: 15px;">
             <button class="modal-export-btn" id="exportBtn">📥 تنزيل البيانات (Excel + نص)</button>
-            <button class="modal-export-btn" id="setupDbBtn" style="background:linear-gradient(135deg,#9B5DE5,#EF476F); margin-inline-start:8px;">🔧 تهيئة قاعدة البيانات المشتركة</button>
+            <button class="modal-export-btn" id="setupDbBtn" style="background:linear-gradient(135deg,#9B5DE5,#EF476F); margin-inline-start:8px;">🔧 تهيئة قاعدة البيانات المشتركة (مرة واحدة فقط)</button>
         </div>
+        <p style="font-size:0.78rem; color:#9b8aa0; text-align:center; margin-top:10px;">
+            استخدم هذا الزر مرة واحدة فقط عند إعداد الصفحة لأول مرة على الاستضافة الجديدة، ثم أرسل الرقم الظاهر لإتمام الربط الدائم.
+        </p>
         <div id="setupResultBox" style="display:none; margin-top:14px; background:#fff9e6; border:2px solid #FFD166; border-radius:16px; padding:14px 16px; text-align:center;">
-            <div style="font-size:0.85rem; font-weight:700; color:#5f2d8a; margin-bottom:8px;">كود قاعدة البيانات - انسخه وابعته في الشات:</div>
+            <div style="font-size:0.85rem; font-weight:700; color:#5f2d8a; margin-bottom:8px;">هذا هو الكود — انسخه أو صوّره وابعته في الشات:</div>
             <input id="setupResultInput" type="text" readonly style="width:100%; text-align:center; direction:ltr; font-size:1rem; font-weight:800; padding:10px; border-radius:10px; border:2px solid #9B5DE5; background:#fff; color:#2d1b3d;">
             <button id="setupCopyBtn" type="button" style="margin-top:10px; background:#06D6A0; color:#fff; border:none; padding:8px 20px; border-radius:30px; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif;">📋 نسخ الكود</button>
+            <div id="setupCopyStatus" style="font-size:0.8rem; color:#5f2d8a; margin-top:6px;"></div>
         </div>
     </div>
 </div>
 
-<!-- Modal عرض المجموعات والمقاعد -->
+<!-- نافذة المجموعات والمقاعد -->
 <div class="modal-overlay" id="groupsModal">
     <div class="modal-content">
         <button class="modal-close" id="groupsModalCloseBtn">✕</button>
@@ -807,632 +839,591 @@
     </div>
 </div>
 
-<!-- مؤشر حالة المزامنة -->
-<div id="syncStatus">
-    <span class="dot green" id="syncDot"></span>
-    <span id="syncText">متصل</span>
-    <span style="margin:0 8px;color:#888;">|</span>
-    <span id="syncTime">جاري التحديث...</span>
+<!-- رسالة توضيحية -->
+<div style="margin-top:10px; font-size:0.8rem; color:#9b8aa0; text-align:center; max-width:700px;">
+    ⚡ جميع البيانات محفوظة في قاعدة بيانات مشتركة على الإنترنت، وتتحدث تلقائياً كل بضع ثوانٍ عند أي شخص يفتح نفس الرابط من أي جهاز.
 </div>
 
+<!-- Firebase: قاعدة بيانات مشتركة على الإنترنت لمزامنة الحجوزات بين كل الأجهزة -->
+<!-- تخزين البيانات المشتركة على jsonblob.com (بدون تسجيل دخول أو مفتاح API) -->
 <script>
-    // ================================================================
-    //  🔗 قاعدة البيانات المشتركة - كود التهيئة
-    //  🔑 019fb999-ed4e-7689-bf22-f89a326e0f2c
-    // ================================================================
+    // معرّف الـ Blob الخاص بالمشروع - كل البيانات (المجموعات والحجوزات) بتتخزن هنا.
+    // مهم جدًا: لازم يكون نفس الرقم مكتوب هنا في كل نسخة من الملف على أي جهاز أو استضافة،
+    // عشان كل الأجهزة تقرأ وتكتب في نفس قاعدة البيانات. لو سيبته فاضي، هيتم إنشاء رقم جديد
+    // بس هيفضل يستخدمه المتصفح ده بس (وده كان سبب عدم وصول البيانات للجهاز التاني).
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
-    const POLL_INTERVAL_MS = 3000; // 3 ثواني للمزامنة السريعة
-
+    const POLL_INTERVAL_MS = 5000;
     function getBlobUrl() {
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
+</script>
 
-    // --------------------- بيانات التطبيق ---------------------
-    let groups = [];
-    let bookings = [];
-    const DEFAULT_CAPACITY = 30;
-    const defaultGroups = [
-        { name: 'مجموعة السبت 4 عصر', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الأحد 6 مساء', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
-    ];
+<script>
+    (function() {
+        // ---------- البيانات المشتركة (jsonblob.com) ----------
+        let groups = [];
+        let bookings = [];
 
-    let isSaving = false;
-    let lastSyncTime = null;
-    let syncErrorCount = 0;
+        const DEFAULT_CAPACITY = 30;
+        const defaultGroups = [
+            { name: 'مجموعة السبت 4 عصر', capacity: DEFAULT_CAPACITY },
+            { name: 'مجموعة الأحد 6 مساء', capacity: DEFAULT_CAPACITY },
+            { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY }
+        ];
 
-    // --------------------- عناصر UI للمزامنة ---------------------
-    const syncDot = document.getElementById('syncDot');
-    const syncText = document.getElementById('syncText');
-    const syncTime = document.getElementById('syncTime');
-
-    function updateSyncStatus(status, message) {
-        if (status === 'connected') {
-            syncDot.className = 'dot green';
-            syncText.textContent = '🟢 متصل';
-        } else if (status === 'syncing') {
-            syncDot.className = 'dot yellow';
-            syncText.textContent = '🔄 جاري المزامنة...';
-        } else if (status === 'error') {
-            syncDot.className = 'dot red';
-            syncText.textContent = '🔴 خطأ في المزامنة';
-        }
-        if (message) syncTime.textContent = message;
-    }
-
-    // ================================================================
-    //  📥 تحميل البيانات من السيرفر (jsonblob.com)
-    // ================================================================
-    async function loadData() {
-        try {
-            const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
-            const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
-            if (Array.isArray(lg) && lg.length) groups = lg;
-            if (Array.isArray(lb)) bookings = lb;
-        } catch (e) {}
-
-        if (!JSONBLOB_ID) return false;
-
-        try {
-            updateSyncStatus('syncing', 'جاري التحميل من السيرفر...');
-            const res = await fetch(getBlobUrl(), {
-                headers: { 'Accept': 'application/json' }
-            });
-            
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            
-            const data = await res.json();
-            
-            if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
-                groups = data.groups;
-            } else {
-                groups = defaultGroups;
-            }
-            
-            bookings = Array.isArray(data.bookings) ? data.bookings : [];
-            groups = groups.map(g => ({ ...g, locked: g.locked || false }));
-            
-            localStorage.setItem('bookingGroups', JSON.stringify(groups));
-            localStorage.setItem('bookingList', JSON.stringify(bookings));
-            
-            lastSyncTime = new Date();
-            syncErrorCount = 0;
-            updateSyncStatus('connected', 'آخر تحديث: ' + lastSyncTime.toLocaleTimeString('ar-EG'));
-            return true;
-        } catch (err) {
-            console.error('تعذر تحميل البيانات:', err);
-            syncErrorCount++;
-            updateSyncStatus('error', 'خطأ: ' + err.message);
-            return false;
-        }
-    }
-
-    // ================================================================
-    //  📤 حفظ البيانات على السيرفر (jsonblob.com)
-    // ================================================================
-    async function saveData() {
-        if (isSaving) return;
-        isSaving = true;
-
-        localStorage.setItem('bookingGroups', JSON.stringify(groups));
-        localStorage.setItem('bookingList', JSON.stringify(bookings));
-
-        if (!JSONBLOB_ID) {
+        // تحميل آخر نسخة من البيانات من السيرفر
+        async function loadData() {
+            // نسخة محلية احتياطية
             try {
-                updateSyncStatus('syncing', 'إنشاء قاعدة بيانات جديدة...');
-                const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
+                const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
+                if (Array.isArray(lg) && lg.length) groups = lg;
+                if (Array.isArray(lb)) bookings = lb;
+            } catch (e) {}
+
+            if (!JSONBLOB_ID) return false;
+            try {
+                const res = await fetch(getBlobUrl(), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                groups = Array.isArray(data.groups) && data.groups.length ? data.groups : defaultGroups;
+                bookings = Array.isArray(data.bookings) ? data.bookings : [];
+                try {
+                    localStorage.setItem('bookingGroups', JSON.stringify(groups));
+                    localStorage.setItem('bookingList', JSON.stringify(bookings));
+                } catch (e) {}
+                return true;
+            } catch (err) {
+                console.error('تعذر تحميل البيانات:', err);
+                return false;
+            }
+        }
+
+        // حفظ البيانات الحالية على السيرفر
+        async function saveData() {
+            try {
+                localStorage.setItem('bookingGroups', JSON.stringify(groups));
+                localStorage.setItem('bookingList', JSON.stringify(bookings));
+            } catch (e) {}
+
+            if (!JSONBLOB_ID) {
+                // إنشاء مساحة تخزين سحابية تلقائياً (يحدث مرة واحدة فقط في عمر المشروع)
+                try {
+                    const res = await fetch('https://jsonblob.com/api/jsonBlob', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ groups, bookings })
+                    });
+                    if (res.ok) {
+                        const loc = res.headers.get('Location') || res.headers.get('location') || '';
+                        const id = loc.split('/').pop();
+                        if (id) {
+                            JSONBLOB_ID = id;
+                            localStorage.setItem('bookingBlobId', id);
+                            console.log('JSONBLOB_ID الجديد:', id);
+                            showSetupResult(id);
+                        }
+                    }
+                } catch (e) {
+                    console.error('إنشاء Blob فشل', e);
+                }
+            }
+            if (!JSONBLOB_ID) return;
+
+            try {
+                await fetch(getBlobUrl(), {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ groups, bookings })
                 });
-                if (res.ok) {
-                    const loc = res.headers.get('Location') || res.headers.get('location') || '';
-                    const id = loc.split('/').pop();
-                    if (id) {
-                        JSONBLOB_ID = id;
-                        localStorage.setItem('bookingBlobId', id);
-                        showSetupResult(id);
-                    }
-                }
-            } catch (e) {
-                console.error('إنشاء Blob فشل', e);
-                isSaving = false;
-                return;
+            } catch (err) {
+                console.error('تعذر حفظ البيانات:', err);
+                alert('تم الحفظ على هذا الجهاز. فشل الإرسال للسحابة — تحقق من الإنترنت.');
             }
         }
 
-        if (!JSONBLOB_ID) {
-            isSaving = false;
-            return;
-        }
-
-        try {
-            updateSyncStatus('syncing', 'جاري الحفظ على السيرفر...');
-            await fetch(getBlobUrl(), {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ groups, bookings })
-            });
-            lastSyncTime = new Date();
-            syncErrorCount = 0;
-            updateSyncStatus('connected', 'تم الحفظ: ' + lastSyncTime.toLocaleTimeString('ar-EG'));
-        } catch (err) {
-            console.error('تعذر حفظ البيانات:', err);
-            syncErrorCount++;
-            updateSyncStatus('error', 'خطأ في الحفظ: ' + err.message);
-        }
-        isSaving = false;
-    }
-
-    // ================================================================
-    //  🔄 مزامنة البيانات مع السيرفر (تحديث دوري)
-    // ================================================================
-    async function refreshFromServer() {
-        const success = await loadData();
-        if (success) {
+        // إعادة تحميل البيانات من السيرفر وتحديث الواجهة (يُستخدم أول ما تفتح الصفحة، وبشكل دوري)
+        async function refreshFromServer() {
+            const ok = await loadData();
+            if (!ok) return;
             renderGroups();
             renderBookings();
             if (adminModal.classList.contains('active')) renderAdminBookings();
             if (groupsModal.classList.contains('active')) renderGroupsWindow();
         }
-    }
 
-    function startSync() {
-        console.log('🔄 بدء المزامنة مع قاعدة البيانات المشتركة...');
-        console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-        updateSyncStatus('syncing', 'جاري الاتصال بقاعدة البيانات...');
-        
-        // تحميل فوري
-        refreshFromServer().then(() => {
-            console.log('✅ تم التحميل الأولي بنجاح');
-        });
-        
-        // مزامنة دورية
-        setInterval(async () => {
-            await refreshFromServer();
-        }, POLL_INTERVAL_MS);
-        
-        console.log('✅ المزامنة تعمل كل', POLL_INTERVAL_MS / 1000, 'ثواني');
-    }
+        function startSync() {
+            refreshFromServer();
+            setInterval(refreshFromServer, POLL_INTERVAL_MS);
+        }
 
-    // --------------------- دوال مساعدة ---------------------
-    function getGroupCount(groupName) {
-        return bookings.filter(b => b.group === groupName).length;
-    }
+        // عدد الطلبة المسجلين حالياً في مجموعة معينة
+        function getGroupCount(groupName) {
+            return bookings.filter(b => b.group === groupName).length;
+        }
 
-    function isGroupFull(groupObj) {
-        if (groupObj.locked) return true;
-        return getGroupCount(groupObj.name) >= groupObj.capacity;
-    }
+        function isGroupFull(groupObj) {
+            return getGroupCount(groupObj.name) >= groupObj.capacity;
+        }
 
-    // --------------------- عناصر الصفحة ---------------------
-    const groupSelect = document.getElementById('groupSelect');
-    const groupTagsContainer = document.getElementById('groupTagsContainer');
-    const newGroupInput = document.getElementById('newGroupInput');
-    const newGroupCapacityInput = document.getElementById('newGroupCapacityInput');
-    const addGroupBtn = document.getElementById('addGroupBtn');
-    const bookingsList = document.getElementById('bookingsList');
-    const confirmationBox = document.getElementById('confirmationBox');
-    const bookingForm = document.getElementById('bookingForm');
+        // مرجع للعناصر
+        const groupSelect = document.getElementById('groupSelect');
+        const groupTagsContainer = document.getElementById('groupTagsContainer');
+        const newGroupInput = document.getElementById('newGroupInput');
+        const addGroupBtn = document.getElementById('addGroupBtn');
+        const bookingsList = document.getElementById('bookingsList');
+        const confirmationBox = document.getElementById('confirmationBox');
+        const bookingForm = document.getElementById('bookingForm');
 
-    const adminPanelBtn = document.getElementById('adminPanelBtn');
-    const adminModal = document.getElementById('adminModal');
-    const modalCloseBtn = document.getElementById('modalCloseBtn');
-    const modalBookingsList = document.getElementById('modalBookingsList');
-    const totalCount = document.getElementById('totalCount');
-    const groupCount = document.getElementById('groupCount');
-    const exportBtn = document.getElementById('exportBtn');
-    const setupDbBtn = document.getElementById('setupDbBtn');
-    const setupResultBox = document.getElementById('setupResultBox');
-    const setupResultInput = document.getElementById('setupResultInput');
-    const setupCopyBtn = document.getElementById('setupCopyBtn');
+        // عناصر لوحة التحكم
+        const adminPanelBtn = document.getElementById('adminPanelBtn');
+        const adminModal = document.getElementById('adminModal');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalBookingsList = document.getElementById('modalBookingsList');
+        const totalCount = document.getElementById('totalCount');
+        const groupCount = document.getElementById('groupCount');
+        const exportBtn = document.getElementById('exportBtn');
+        const setupDbBtn = document.getElementById('setupDbBtn');
+        const setupResultBox = document.getElementById('setupResultBox');
+        const setupResultInput = document.getElementById('setupResultInput');
+        const setupCopyBtn = document.getElementById('setupCopyBtn');
+        const setupCopyStatus = document.getElementById('setupCopyStatus');
 
-    const groupsWindowBtn = document.getElementById('groupsWindowBtn');
-    const groupsModal = document.getElementById('groupsModal');
-    const groupsModalCloseBtn = document.getElementById('groupsModalCloseBtn');
-    const groupsWindowList = document.getElementById('groupsWindowList');
+        function showSetupResult(id) {
+            setupResultBox.style.display = 'block';
+            setupResultInput.value = id;
+            setupCopyStatus.textContent = '';
+            setupResultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setupResultInput.focus();
+            setupResultInput.select();
+        }
 
-    function showSetupResult(id) {
-        setupResultBox.style.display = 'block';
-        setupResultInput.value = id;
-    }
+        // عناصر نافذة المجموعات والمقاعد
+        const groupsWindowBtn = document.getElementById('groupsWindowBtn');
+        const groupsModal = document.getElementById('groupsModal');
+        const groupsModalCloseBtn = document.getElementById('groupsModalCloseBtn');
+        const groupsWindowList = document.getElementById('groupsWindowList');
+        const newGroupCapacityInput = document.getElementById('newGroupCapacityInput');
 
-    // --------------------- عرض المجموعات ---------------------
-    function renderGroups() {
-        groupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
-        groups.forEach(g => {
-            const count = getGroupCount(g.name);
-            const full = isGroupFull(g);
-            const opt = document.createElement('option');
-            opt.value = g.name;
-            let status = '';
-            if (g.locked) status = '🔒 (مقفولة يدوياً)';
-            else if (full) status = '🔒 (مكتملة)';
-            else status = `(${count}/${g.capacity})`;
-            opt.textContent = `${g.name} ${status}`;
-            if (full) opt.disabled = true;
-            groupSelect.appendChild(opt);
-        });
+        // ---------- دوال مساعدة ----------
+        function saveGroups() {
+            saveData();
+        }
 
-        groupTagsContainer.innerHTML = '';
-        groups.forEach((g, idx) => {
-            const count = getGroupCount(g.name);
-            const full = isGroupFull(g);
-            const tag = document.createElement('span');
-            tag.className = `group-tag${g.locked ? ' locked' : ''}`;
-            tag.innerHTML = `
-                ${g.name}
-                <span style="font-size:0.8rem;color:${full ? '#b0003a' : '#5f2d8a'};">(${count}/${g.capacity}${g.locked ? ' 🔒مقفولة' : ''}${!g.locked && full ? ' مكتملة' : ''})</span>
-                <button class="lock-toggle" data-index="${idx}" title="${g.locked ? 'فتح القفل' : 'قفل المجموعة'}">${g.locked ? '🔒' : '🔓'}</button>
-                <button class="del-group" data-index="${idx}">✕</button>
-            `;
-            groupTagsContainer.appendChild(tag);
-        });
+        function saveBookings() {
+            saveData();
+        }
 
-        document.querySelectorAll('.del-group').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                const groupName = groups[parseInt(this.dataset.index)]?.name;
-                await loadData();
-                const idx = groups.findIndex(g => g.name === groupName);
-                if (idx !== -1) groups.splice(idx, 1);
-                await saveData();
-                renderGroups();
-                renderBookings();
+        // عرض المجموعات في القائمة المنسدلة + كعلامات
+        function renderGroups() {
+            // تحديث الـ select
+            groupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
+            groups.forEach(g => {
+                const count = getGroupCount(g.name);
+                const full = isGroupFull(g);
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = full ? `${g.name} (مكتملة 🔒)` : `${g.name} (${count}/${g.capacity})`;
+                if (full) opt.disabled = true;
+                groupSelect.appendChild(opt);
             });
-        });
 
-        document.querySelectorAll('.lock-toggle').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                const idx = parseInt(this.dataset.index);
-                const group = groups[idx];
-                if (!group) return;
-                const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد العملية:');
-                if (password === 'admin123') {
-                    group.locked = !group.locked;
+            // تحديث علامات المجموعات
+            groupTagsContainer.innerHTML = '';
+            groups.forEach((g, idx) => {
+                const count = getGroupCount(g.name);
+                const full = isGroupFull(g);
+                const tag = document.createElement('span');
+                tag.className = 'group-tag';
+                tag.innerHTML = `${g.name} <span style="font-size:0.8rem;color:${full ? '#b0003a' : '#5f2d8a'};">(${count}/${g.capacity}${full ? ' مكتملة' : ''})</span> <button class="del-group" data-index="${idx}">✕</button>`;
+                groupTagsContainer.appendChild(tag);
+            });
+
+            // إضافة حدث الحذف لكل زر
+            document.querySelectorAll('.del-group').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    const groupName = groups[parseInt(this.dataset.index)]?.name;
+                    await loadData();
+                    const idx = groups.findIndex(g => g.name === groupName);
+                    if (idx !== -1) groups.splice(idx, 1);
                     await saveData();
                     renderGroups();
                     renderBookings();
-                    if (groupsModal.classList.contains('active')) renderGroupsWindow();
-                } else if (password !== null) {
-                    alert('❌ كلمة المرور غير صحيحة!');
-                }
-            });
-        });
-    }
-
-    // --------------------- عرض الحجوزات ---------------------
-    function renderBookings() {
-        if (bookings.length === 0) {
-            bookingsList.innerHTML = `<div class="no-bookings">لا توجد حجوزات حتى الآن</div>`;
-            return;
-        }
-        let html = '';
-        const reversed = [...bookings].reverse();
-        reversed.forEach((b, idx) => {
-            const realIndex = bookings.length - 1 - idx;
-            html += `
-                <div class="booking-card" data-index="${realIndex}">
-                    <div class="student-name">👤 ${b.studentName}</div>
-                    <div class="details">
-                        <span>📘 ${b.stage}</span>
-                        <span>📚 ${b.group}</span>
-                        <span>📞 ${b.studentPhone}</span>
-                        <span>📞 ولي: ${b.parentPhone}</span>
-                    </div>
-                    <div class="timestamp">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
-                    <div class="actions">
-                        <button class="edit-btn" data-index="${realIndex}">✏️ تعديل</button>
-                        <button class="delete-btn" data-index="${realIndex}">🗑️ حذف</button>
-                    </div>
-                </div>
-            `;
-        });
-        bookingsList.innerHTML = html;
-
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                const idx = parseInt(this.dataset.index);
-                const booking = bookings[idx];
-                if (!booking) return;
-                const password = prompt('🔐 أدخل كلمة مرور المدير لتعديل بيانات الطالب:');
-                if (password !== 'admin123') {
-                    if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
-                    return;
-                }
-                const newName = prompt('✏️ تعديل اسم الطالب:', booking.studentName);
-                if (newName !== null && newName.trim()) booking.studentName = newName.trim();
-                const newPhone = prompt('📞 تعديل تليفون الطالب:', booking.studentPhone);
-                if (newPhone !== null && newPhone.trim()) booking.studentPhone = newPhone.trim();
-                const newParentPhone = prompt('📞 تعديل تليفون ولي الأمر:', booking.parentPhone);
-                if (newParentPhone !== null && newParentPhone.trim()) booking.parentPhone = newParentPhone.trim();
-                booking.timestamp = new Date().toLocaleString('ar-EG', { hour12: true }) + ' (تم التعديل)';
-                await saveData();
-                renderBookings();
-                if (adminModal.classList.contains('active')) renderAdminBookings();
-                if (groupsModal.classList.contains('active')) renderGroupsWindow();
-            });
-        });
-
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                const idx = parseInt(this.dataset.index);
-                const booking = bookings[idx];
-                if (!booking) return;
-                const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد حذف الحجز:');
-                if (password !== 'admin123') {
-                    if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
-                    return;
-                }
-                if (confirm(`هل أنت متأكد من حذف حجز الطالب "${booking.studentName}"؟`)) {
-                    bookings.splice(idx, 1);
-                    await saveData();
-                    renderBookings();
-                    if (adminModal.classList.contains('active')) renderAdminBookings();
-                    if (groupsModal.classList.contains('active')) renderGroupsWindow();
-                }
-            });
-        });
-    }
-
-    // --------------------- عرض الحجوزات في لوحة التحكم ---------------------
-    function renderAdminBookings() {
-        totalCount.textContent = bookings.length;
-        groupCount.textContent = groups.length;
-
-        if (bookings.length === 0) {
-            modalBookingsList.innerHTML = `<div class="modal-empty">📭 لا توجد حجوزات مسجلة حتى الآن</div>`;
-            return;
-        }
-
-        let html = '';
-        const reversed = [...bookings].reverse();
-        reversed.forEach((b, index) => {
-            html += `
-                <div class="modal-booking-card">
-                    <div class="m-name">#${index + 1} 👤 ${b.studentName}</div>
-                    <div class="m-details">
-                        <span>📘 ${b.stage}</span>
-                        <span>📚 ${b.group}</span>
-                        <span>📞 ${b.studentPhone}</span>
-                        <span>📞 ولي: ${b.parentPhone}</span>
-                    </div>
-                    <div class="m-time">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
-                </div>
-            `;
-        });
-        modalBookingsList.innerHTML = html;
-    }
-
-    // --------------------- عرض نافذة المجموعات والمقاعد ---------------------
-    function renderGroupsWindow() {
-        if (groups.length === 0) {
-            groupsWindowList.innerHTML = `<div class="gw-empty">لا توجد مجموعات مضافة حتى الآن</div>`;
-            return;
-        }
-
-        let html = '';
-        groups.forEach(g => {
-            const studentsInGroup = bookings.filter(b => b.group === g.name);
-            const count = studentsInGroup.length;
-            const full = isGroupFull(g);
-            const percent = Math.min((count / g.capacity) * 100, 100);
-
-            let studentsHtml = '';
-            if (studentsInGroup.length === 0) {
-                studentsHtml = `<div class="gw-empty">لا يوجد طلاب مسجلين في هذه المجموعة بعد</div>`;
-            } else {
-                studentsInGroup.forEach((b, i) => {
-                    studentsHtml += `<div class="gw-student">${i + 1}. 👤 ${b.studentName} — 📘 ${b.stage}</div>`;
                 });
+            });
+        }
+
+        // عرض الحجوزات في الصفحة الرئيسية
+        function renderBookings() {
+            if (bookings.length === 0) {
+                bookingsList.innerHTML = `<div class="no-bookings">لا توجد حجوزات حتى الآن</div>`;
+                return;
+            }
+            let html = '';
+            const reversed = [...bookings].reverse();
+            reversed.forEach(b => {
+                html += `
+                    <div class="booking-card">
+                        <div class="student-name">👤 ${b.studentName}</div>
+                        <div class="details">
+                            <span>📘 ${b.stage}</span>
+                            <span>📚 ${b.group}</span>
+                            <span>📞 ${b.studentPhone}</span>
+                            <span>📞 ولي: ${b.parentPhone}</span>
+                        </div>
+                        <div class="timestamp">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
+                    </div>
+                `;
+            });
+            bookingsList.innerHTML = html;
+        }
+
+        // عرض الحجوزات في نافذة المشرف
+        function renderAdminBookings() {
+            // تحديث الإحصائيات
+            totalCount.textContent = bookings.length;
+            groupCount.textContent = groups.length;
+
+            if (bookings.length === 0) {
+                modalBookingsList.innerHTML = `<div class="modal-empty">📭 لا توجد حجوزات مسجلة حتى الآن</div>`;
+                return;
             }
 
-            let statusClass = '';
-            let statusText = '';
-            if (g.locked) { statusClass = 'locked-manual'; statusText = '🔒 مقفولة يدوياً'; }
-            else if (full) { statusClass = 'full'; statusText = '🔒 مكتملة'; }
-            else { statusText = `متاحة (${g.capacity - count} مقعد)`; }
-
-            html += `
-                <div class="group-window-card ${statusClass}">
-                    <div class="gw-header">
-                        <span class="gw-name">📁 ${g.name}</span>
-                        <span class="gw-count">${count} / ${g.capacity} ${statusText}</span>
+            let html = '';
+            const reversed = [...bookings].reverse();
+            reversed.forEach((b, index) => {
+                html += `
+                    <div class="modal-booking-card">
+                        <div class="m-name">#${index + 1} 👤 ${b.studentName}</div>
+                        <div class="m-details">
+                            <span>📘 ${b.stage}</span>
+                            <span>📚 ${b.group}</span>
+                            <span>📞 ${b.studentPhone}</span>
+                            <span>📞 ولي: ${b.parentPhone}</span>
+                        </div>
+                        <div class="m-time">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
                     </div>
-                    <div class="gw-progress"><div class="gw-progress-bar" style="width:${percent}%"></div></div>
-                    <div class="gw-students">${studentsHtml}</div>
-                </div>
-            `;
-        });
-        groupsWindowList.innerHTML = html;
-    }
-
-    // --------------------- تسجيل حجز جديد ---------------------
-    async function handleBooking(e) {
-        e.preventDefault();
-
-        const stage = document.getElementById('stage').value;
-        const studentName = document.getElementById('studentName').value.trim();
-        const studentPhone = document.getElementById('studentPhone').value.trim();
-        const parentPhone = document.getElementById('parentPhone').value.trim();
-        const group = groupSelect.value;
-
-        if (!stage || !studentName || !studentPhone || !parentPhone || !group) {
-            alert('الرجاء ملء جميع الحقول!');
-            return;
+                `;
+            });
+            modalBookingsList.innerHTML = html;
         }
 
-        const submitBtn = bookingForm.querySelector('.btn-primary');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'جارٍ التسجيل...';
+        // إظهار شاشة التأكيد
+        function showConfirmation(bookingData) {
+            confirmationBox.classList.add('active');
+            const waNumber = '01227234406';
+            const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${bookingData.studentName}\nالمرحلة: ${bookingData.stage}\nالمجموعة: ${bookingData.group}\nتليفون الطالب: ${bookingData.studentPhone}\nتليفون ولي الأمر: ${bookingData.parentPhone}`;
+            const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+            document.getElementById('whatsappShareBtn').href = waLink;
 
-        await loadData();
-        renderGroups();
-
-        const groupObj = groups.find(g => g.name === group);
-        if (groupObj && isGroupFull(groupObj)) {
-            alert(`⚠️ عذراً، مجموعة "${group}" غير متاحة للتسجيل (مقفولة أو مكتملة).`);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'تسجيل الحجز';
-            return;
+            document.getElementById('copyLinkBtn').onclick = function() {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('تم نسخ رابط الحجز! يمكنك مشاركته مع الطلاب.');
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = url;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('تم نسخ الرابط!');
+                });
+            };
         }
 
-        const exists = bookings.some(b => b.studentName === studentName && b.group === group);
-        if (exists) {
-            if (!confirm('يوجد حجز سابق بنفس الاسم والمجموعة. هل تريد التسجيل مرة أخرى؟')) {
+        // معالجة تسجيل الحجز
+        async function handleBooking(e) {
+            e.preventDefault();
+
+            const stage = document.getElementById('stage').value;
+            const studentName = document.getElementById('studentName').value.trim();
+            const studentPhone = document.getElementById('studentPhone').value.trim();
+            const parentPhone = document.getElementById('parentPhone').value.trim();
+            const group = groupSelect.value;
+
+            if (!stage || !studentName || !studentPhone || !parentPhone || !group) {
+                alert('الرجاء ملء جميع الحقول!');
+                return;
+            }
+
+            const submitBtn = bookingForm.querySelector('.btn-primary');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جارٍ التسجيل...';
+
+            // تحميل آخر نسخة من البيانات قبل التسجيل لتفادي تعارض التسجيلات المتزامنة
+            await loadData();
+            renderGroups();
+
+            const groupObj = groups.find(g => g.name === group);
+            if (groupObj && isGroupFull(groupObj)) {
+                alert(`⚠️ عذراً، مجموعة "${group}" اكتمل عدد المقاعد بها (${groupObj.capacity} طالب) ولا يمكن التسجيل فيها بعد الآن.`);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'تسجيل الحجز';
                 return;
             }
-        }
 
-        const newBooking = {
-            stage,
-            studentName,
-            studentPhone,
-            parentPhone,
-            group,
-            timestamp: new Date().toLocaleString('ar-EG', { hour12: true })
-        };
-
-        bookings.push(newBooking);
-        await saveData();
-        renderBookings();
-
-        confirmationBox.classList.add('active');
-        const waNumber = '01227234406';
-        const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${studentName}\nالمرحلة: ${stage}\nالمجموعة: ${group}\nتليفون الطالب: ${studentPhone}\nتليفون ولي الأمر: ${parentPhone}`;
-        document.getElementById('whatsappShareBtn').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-        document.getElementById('copyLinkBtn').onclick = function() {
-            navigator.clipboard.writeText(window.location.href).then(() => alert('تم نسخ الرابط!'))
-                .catch(() => { const ta = document.createElement('textarea'); ta.value = window.location.href; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('تم نسخ الرابط!'); });
-        };
-
-        document.getElementById('stage').value = '';
-        document.getElementById('studentName').value = '';
-        document.getElementById('studentPhone').value = '';
-        document.getElementById('parentPhone').value = '';
-        groupSelect.value = '';
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'تسجيل الحجز';
-    }
-
-    // --------------------- إضافة مجموعة ---------------------
-    async function addGroup() {
-        const val = newGroupInput.value.trim();
-        if (!val) { alert('أدخل اسم المجموعة'); return; }
-
-        let capacity = parseInt(newGroupCapacityInput.value, 10);
-        if (!capacity || capacity < 1) capacity = DEFAULT_CAPACITY;
-
-        await loadData();
-        if (groups.some(g => g.name === val)) { alert('المجموعة موجودة بالفعل'); renderGroups(); return; }
-
-        groups.push({ name: val, capacity: capacity, locked: false });
-        await saveData();
-        renderGroups();
-        newGroupInput.value = '';
-        newGroupCapacityInput.value = DEFAULT_CAPACITY;
-    }
-
-    // --------------------- دوال النوافذ المنبثقة ---------------------
-    function openAdminPanel() {
-        const password = prompt('🔐 أدخل كلمة المرور للمشرف:');
-        if (password === 'admin123') {
-            renderAdminBookings();
-            adminModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        } else if (password !== null) {
-            alert('❌ كلمة المرور غير صحيحة!');
-        }
-    }
-
-    function closeAdminPanel() {
-        adminModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function openGroupsWindow() {
-        renderGroupsWindow();
-        groupsModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeGroupsWindow() {
-        groupsModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    // --------------------- تصدير البيانات ---------------------
-    function exportData() {
-        if (bookings.length === 0) {
-            alert('لا توجد بيانات للتصدير!');
-            return;
-        }
-        let csv = '\uFEFFم,الاسم,المرحلة,المجموعة,تليفون الطالب,تليفون ولي الأمر,وقت التسجيل\n';
-        bookings.forEach((b, i) => {
-            csv += [i + 1, b.studentName, b.stage, b.group, b.studentPhone, b.parentPhone, b.timestamp]
-                .map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',') + '\n';
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'حجوزات_' + new Date().toISOString().slice(0, 10) + '.csv';
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-    }
-
-    // ================================================================
-    //  🚀 التهيئة والتشغيل
-    // ================================================================
-    function init() {
-        console.log('🚀 بدء تشغيل دفتر الحجوزات...');
-        console.log('🔑 كود قاعدة البيانات المثبت:', JSONBLOB_ID);
-        console.log('📡 رابط قاعدة البيانات:', getBlobUrl());
-        
-        renderGroups();
-        renderBookings();
-        bookingForm.addEventListener('submit', handleBooking);
-        addGroupBtn.addEventListener('click', addGroup);
-        newGroupInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addGroup(); } });
-
-        adminPanelBtn.addEventListener('click', openAdminPanel);
-        modalCloseBtn.addEventListener('click', closeAdminPanel);
-        adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
-        exportBtn.addEventListener('click', exportData);
-        setupDbBtn.addEventListener('click', async function() {
-            if (JSONBLOB_ID) { 
-                showSetupResult(JSONBLOB_ID); 
-                alert('✅ قاعدة البيانات مفعلة بالفعل بالكود: ' + JSONBLOB_ID);
-                return; 
+            const exists = bookings.some(b => b.studentName === studentName && b.group === group);
+            if (exists) {
+                if (!confirm('يوجد حجز سابق بنفس الاسم والمجموعة. هل تريد التسجيل مرة أخرى؟')) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'تسجيل الحجز';
+                    return;
+                }
             }
+
+            const newBooking = {
+                stage,
+                studentName,
+                studentPhone,
+                parentPhone,
+                group,
+                timestamp: new Date().toLocaleString('ar-EG', { hour12: true })
+            };
+
+            bookings.push(newBooking);
             await saveData();
-            if (!JSONBLOB_ID) alert('حصل خطأ أثناء إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
-        });
-        setupCopyBtn.addEventListener('click', function() {
-            setupResultInput.select();
-            navigator.clipboard.writeText(setupResultInput.value).then(() => alert('✅ تم نسخ الكود!'));
-        });
+            renderBookings();
 
-        groupsWindowBtn.addEventListener('click', openGroupsWindow);
-        groupsModalCloseBtn.addEventListener('click', closeGroupsWindow);
-        groupsModal.addEventListener('click', function(e) { if (e.target === this) closeGroupsWindow(); });
+            showConfirmation(newBooking);
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') { closeAdminPanel(); closeGroupsWindow(); }
-        });
+            document.getElementById('stage').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentPhone').value = '';
+            document.getElementById('parentPhone').value = '';
+            groupSelect.value = '';
 
-        // 🔄 بدء المزامنة مع قاعدة البيانات المشتركة
-        startSync();
-    }
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'تسجيل الحجز';
+        }
 
-    // تشغيل التطبيق
-    init();
+        // إضافة مجموعة جديدة
+        async function addGroup() {
+            const val = newGroupInput.value.trim();
+            if (!val) { alert('أدخل اسم المجموعة'); return; }
+
+            let capacity = parseInt(newGroupCapacityInput.value, 10);
+            if (!capacity || capacity < 1) capacity = DEFAULT_CAPACITY;
+
+            await loadData();
+            if (groups.some(g => g.name === val)) { alert('المجموعة موجودة بالفعل'); renderGroups(); return; }
+
+            groups.push({ name: val, capacity: capacity });
+            await saveData();
+            renderGroups();
+            newGroupInput.value = '';
+            newGroupCapacityInput.value = DEFAULT_CAPACITY;
+        }
+
+        // ---------- نافذة المجموعات والمقاعد ----------
+        function openGroupsWindow() {
+            renderGroupsWindow();
+            groupsModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGroupsWindow() {
+            groupsModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function renderGroupsWindow() {
+            if (groups.length === 0) {
+                groupsWindowList.innerHTML = `<div class="gw-empty">لا توجد مجموعات مضافة حتى الآن</div>`;
+                return;
+            }
+
+            let html = '';
+            groups.forEach(g => {
+                const studentsInGroup = bookings.filter(b => b.group === g.name);
+                const count = studentsInGroup.length;
+                const full = count >= g.capacity;
+                const percent = Math.min((count / g.capacity) * 100, 100);
+
+                let studentsHtml = '';
+                if (studentsInGroup.length === 0) {
+                    studentsHtml = `<div class="gw-empty">لا يوجد طلاب مسجلين في هذه المجموعة بعد</div>`;
+                } else {
+                    studentsInGroup.forEach((b, i) => {
+                        studentsHtml += `<div class="gw-student">${i + 1}. 👤 ${b.studentName} — 📘 ${b.stage}</div>`;
+                    });
+                }
+
+                html += `
+                    <div class="group-window-card ${full ? 'full' : ''}">
+                        <div class="gw-header">
+                            <span class="gw-name">📁 ${g.name}</span>
+                            <span class="gw-count">${count} / ${g.capacity} ${full ? '🔒 مكتملة' : ''}</span>
+                        </div>
+                        <div class="gw-progress"><div class="gw-progress-bar" style="width:${percent}%"></div></div>
+                        <div class="gw-students">${studentsHtml}</div>
+                    </div>
+                `;
+            });
+            groupsWindowList.innerHTML = html;
+        }
+
+        // ---------- دوال لوحة التحكم ----------
+        function openAdminPanel() {
+            const password = prompt('🔐 أدخل كلمة المرور للمشرف:');
+            if (password === 'admin123') {
+                renderAdminBookings();
+                adminModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else if (password !== null) {
+                alert('❌ كلمة المرور غير صحيحة!');
+            }
+        }
+
+        function closeAdminPanel() {
+            adminModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // تصدير البيانات - تنزيل ملف + نسخ
+        function exportData() {
+            if (bookings.length === 0) {
+                alert('لا توجد بيانات للتصدير!');
+                return;
+            }
+
+            // 1) ملف CSV يفتح على Excel
+            let csv = '\uFEFF';
+            csv += 'م,الاسم,المرحلة,المجموعة,تليفون الطالب,تليفون ولي الأمر,وقت التسجيل\n';
+            bookings.forEach((b, i) => {
+                const row = [
+                    i + 1,
+                    b.studentName || '',
+                    b.stage || '',
+                    b.group || '',
+                    b.studentPhone || '',
+                    b.parentPhone || '',
+                    b.timestamp || ''
+                ].map(cell => {
+                    const s = String(cell).replace(/"/g, '""');
+                    return '"' + s + '"';
+                });
+                csv += row.join(',') + '\n';
+            });
+
+            const csvBlob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const csvUrl = URL.createObjectURL(csvBlob);
+            const a1 = document.createElement('a');
+            a1.href = csvUrl;
+            a1.download = ' حجوزات_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a1.style.display = 'none';
+            document.body.appendChild(a1);
+            a1.click();
+            document.body.removeChild(a1);
+            setTimeout(() => URL.revokeObjectURL(csvUrl), 2000);
+
+            // 2) ملف نصي للتقرير
+            let text = 'تقرير الحجوزات - مستر علاء الحفني\n';
+            text += '='.repeat(40) + '\n';
+            text += 'إجمالي الحجوزات: ' + bookings.length + '\n';
+            text += 'عدد المجموعات: ' + groups.length + '\n';
+            text += '='.repeat(40) + '\n\n';
+            bookings.forEach((b, i) => {
+                text += '#' + (i + 1) + '\n';
+                text += '  الاسم: ' + b.studentName + '\n';
+                text += '  المرحلة: ' + b.stage + '\n';
+                text += '  المجموعة: ' + b.group + '\n';
+                text += '  تليفون الطالب: ' + b.studentPhone + '\n';
+                text += '  تليفون ولي الأمر: ' + b.parentPhone + '\n';
+                text += '  وقت التسجيل: ' + (b.timestamp || '') + '\n';
+                text += '-'.repeat(30) + '\n';
+            });
+
+            const txtBlob = new Blob(['\uFEFF' + text], { type: 'text/plain;charset=utf-8;' });
+            const txtUrl = URL.createObjectURL(txtBlob);
+            const a2 = document.createElement('a');
+            a2.href = txtUrl;
+            a2.download = 'تقرير_حجوزات_' + new Date().toISOString().slice(0, 10) + '.txt';
+            a2.style.display = 'none';
+            document.body.appendChild(a2);
+            a2.click();
+            document.body.removeChild(a2);
+            setTimeout(() => URL.revokeObjectURL(txtUrl), 2000);
+
+            // 3) محاولة النسخ للحافظة
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(function() {});
+            }
+
+            alert('✅ تم تنزيل ملفين:\n1) ملف Excel/CSV\n2) تقرير نصي\n\nابحث عن الملفات في مجلد التنزيلات.');
+        }
+
+        // تهيئة الصفحة }
+
+        // تهيئة الصفحة
+        function init() {
+            renderGroups();
+            renderBookings();
+            bookingForm.addEventListener('submit', handleBooking);
+            addGroupBtn.addEventListener('click', addGroup);
+            newGroupInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addGroup(); } });
+
+            // أحداث لوحة التحكم
+            adminPanelBtn.addEventListener('click', openAdminPanel);
+            modalCloseBtn.addEventListener('click', closeAdminPanel);
+            adminModal.addEventListener('click', function(e) {
+                if (e.target === this) closeAdminPanel();
+            });
+            exportBtn.addEventListener('click', exportData);
+            setupDbBtn.addEventListener('click', async function() {
+                if (JSONBLOB_ID) {
+                    showSetupResult(JSONBLOB_ID);
+                    setupCopyStatus.textContent = 'قاعدة البيانات مُفعّلة بالفعل بهذا الكود.';
+                    return;
+                }
+                await saveData();
+                if (!JSONBLOB_ID) {
+                    alert('حصل خطأ أثناء إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
+                }
+            });
+            setupCopyBtn.addEventListener('click', function() {
+                setupResultInput.focus();
+                setupResultInput.select();
+                setupResultInput.setSelectionRange(0, 9999);
+                let copied = false;
+                try{
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(setupResultInput.value);
+                        copied = true;
+                    }
+                }catch(e){}
+                if (!copied) {
+                    try { copied = document.execCommand('copy'); } catch(e) {}
+                }
+                setupCopyStatus.textContent = copied
+                    ? '✅ تم النسخ، الصقه دلوقتي في الشات.'
+                    : '⚠️ تعذّر النسخ التلقائي — الكود متحدد جواته، اضغط مطولاً واختر "نسخ"، أو اكتبه يدويًا: ' + setupResultInput.value;
+            });
+
+            // أحداث نافذة المجموعات والمقاعد
+            groupsWindowBtn.addEventListener('click', openGroupsWindow);
+            groupsModalCloseBtn.addEventListener('click', closeGroupsWindow);
+            groupsModal.addEventListener('click', function(e) {
+                if (e.target === this) closeGroupsWindow();
+            });
+
+            // إغلاق النافذة بزر ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') { closeAdminPanel(); closeGroupsWindow(); }
+            });
+
+            // بدء المزامنة مع قاعدة البيانات المشتركة
+            startSync();
+        }
+
+        init();
+    })();
 </script>
 
 </body>
