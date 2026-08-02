@@ -778,10 +778,14 @@
 </div>
 
 <script>
-    // --------------------- قاعدة البيانات المشتركة ---------------------
+    // ================================================================
+    //  🔗 قاعدة البيانات المشتركة - تم التهيئة مسبقاً بالكود التالي:
+    //  🔑 019fb999-ed4e-7689-bf22-f89a326e0f2c
+    // ================================================================
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 5000;
+    
     function getBlobUrl() {
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
@@ -796,8 +800,11 @@
         { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
     ];
 
-    // تحميل البيانات من السيرفر
+    // ================================================================
+    //  📥 تحميل البيانات من السيرفر (jsonblob.com)
+    // ================================================================
     async function loadData() {
+        // تحميل النسخة المحلية كاحتياطي
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
@@ -805,17 +812,24 @@
             if (Array.isArray(lb)) bookings = lb;
         } catch (e) {}
 
+        // إذا لم يوجد كود قاعدة البيانات، نخرج
         if (!JSONBLOB_ID) return false;
+        
         try {
             const res = await fetch(getBlobUrl(), {
                 headers: { 'Accept': 'application/json' }
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
+            
+            // تحميل البيانات من السيرفر
             groups = Array.isArray(data.groups) && data.groups.length ? data.groups : defaultGroups;
             bookings = Array.isArray(data.bookings) ? data.bookings : [];
+            
             // التأكد من وجود خاصية locked في كل مجموعة
             groups = groups.map(g => ({ ...g, locked: g.locked || false }));
+            
+            // حفظ نسخة محلية
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
             return true;
@@ -825,11 +839,15 @@
         }
     }
 
-    // حفظ البيانات على السيرفر
+    // ================================================================
+    //  📤 حفظ البيانات على السيرفر (jsonblob.com)
+    // ================================================================
     async function saveData() {
+        // حفظ نسخة محلية
         localStorage.setItem('bookingGroups', JSON.stringify(groups));
         localStorage.setItem('bookingList', JSON.stringify(bookings));
 
+        // إذا لم يوجد كود، نحاول إنشاء قاعدة بيانات جديدة
         if (!JSONBLOB_ID) {
             try {
                 const res = await fetch('https://jsonblob.com/api/jsonBlob', {
@@ -850,8 +868,10 @@
                 console.error('إنشاء Blob فشل', e);
             }
         }
+        
         if (!JSONBLOB_ID) return;
 
+        // حفظ على السيرفر
         try {
             await fetch(getBlobUrl(), {
                 method: 'PUT',
@@ -867,6 +887,9 @@
         }
     }
 
+    // ================================================================
+    //  🔄 مزامنة البيانات مع السيرفر (تحديث دوري)
+    // ================================================================
     async function refreshFromServer() {
         await loadData();
         renderGroups();
@@ -876,8 +899,11 @@
     }
 
     function startSync() {
+        console.log('🔄 بدء المزامنة مع قاعدة البيانات المشتركة...');
+        console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
         refreshFromServer();
         setInterval(refreshFromServer, POLL_INTERVAL_MS);
+        console.log('✅ المزامنة تعمل كل', POLL_INTERVAL_MS / 1000, 'ثواني');
     }
 
     // --------------------- دوال مساعدة ---------------------
@@ -886,7 +912,7 @@
     }
 
     function isGroupFull(groupObj) {
-        if (groupObj.locked) return true; // القفل اليدوي يمنع التسجيل
+        if (groupObj.locked) return true;
         return getGroupCount(groupObj.name) >= groupObj.capacity;
     }
 
@@ -900,7 +926,6 @@
     const confirmationBox = document.getElementById('confirmationBox');
     const bookingForm = document.getElementById('bookingForm');
 
-    // عناصر لوحة التحكم
     const adminPanelBtn = document.getElementById('adminPanelBtn');
     const adminModal = document.getElementById('adminModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -913,7 +938,6 @@
     const setupResultInput = document.getElementById('setupResultInput');
     const setupCopyBtn = document.getElementById('setupCopyBtn');
 
-    // عناصر نافذة المجموعات والمقاعد
     const groupsWindowBtn = document.getElementById('groupsWindowBtn');
     const groupsModal = document.getElementById('groupsModal');
     const groupsModalCloseBtn = document.getElementById('groupsModalCloseBtn');
@@ -926,7 +950,6 @@
 
     // --------------------- عرض المجموعات ---------------------
     function renderGroups() {
-        // تحديث القائمة المنسدلة
         groupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
         groups.forEach(g => {
             const count = getGroupCount(g.name);
@@ -942,7 +965,6 @@
             groupSelect.appendChild(opt);
         });
 
-        // تحديث علامات المجموعات
         groupTagsContainer.innerHTML = '';
         groups.forEach((g, idx) => {
             const count = getGroupCount(g.name);
@@ -958,7 +980,6 @@
             groupTagsContainer.appendChild(tag);
         });
 
-        // أحداث الأزرار
         document.querySelectorAll('.del-group').forEach(btn => {
             btn.addEventListener('click', async function(e) {
                 const groupName = groups[parseInt(this.dataset.index)]?.name;
@@ -976,7 +997,6 @@
                 const idx = parseInt(this.dataset.index);
                 const group = groups[idx];
                 if (!group) return;
-                // طلب كلمة المرور لتأكيد القفل/الفتح
                 const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد العملية:');
                 if (password === 'admin123') {
                     group.locked = !group.locked;
@@ -991,7 +1011,7 @@
         });
     }
 
-    // --------------------- عرض الحجوزات مع أزرار التعديل والحذف ---------------------
+    // --------------------- عرض الحجوزات ---------------------
     function renderBookings() {
         if (bookings.length === 0) {
             bookingsList.innerHTML = `<div class="no-bookings">لا توجد حجوزات حتى الآن</div>`;
@@ -1020,19 +1040,16 @@
         });
         bookingsList.innerHTML = html;
 
-        // أحداث أزرار التعديل والحذف
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', async function(e) {
                 const idx = parseInt(this.dataset.index);
                 const booking = bookings[idx];
                 if (!booking) return;
-                // طلب كلمة المرور
                 const password = prompt('🔐 أدخل كلمة مرور المدير لتعديل بيانات الطالب:');
                 if (password !== 'admin123') {
                     if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
                     return;
                 }
-                // فتح نافذة تعديل بسيطة
                 const newName = prompt('✏️ تعديل اسم الطالب:', booking.studentName);
                 if (newName !== null && newName.trim()) booking.studentName = newName.trim();
                 const newPhone = prompt('📞 تعديل تليفون الطالب:', booking.studentPhone);
@@ -1192,7 +1209,6 @@
         await saveData();
         renderBookings();
 
-        // إظهار شاشة التأكيد
         confirmationBox.classList.add('active');
         const waNumber = '01227234406';
         const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${studentName}\nالمرحلة: ${stage}\nالمجموعة: ${group}\nتليفون الطالب: ${studentPhone}\nتليفون ولي الأمر: ${parentPhone}`;
@@ -1280,6 +1296,9 @@
 
     // --------------------- التهيئة ---------------------
     function init() {
+        console.log('🚀 بدء تشغيل دفتر الحجوزات...');
+        console.log('🔑 كود قاعدة البيانات المثبت:', JSONBLOB_ID);
+        
         renderGroups();
         renderBookings();
         bookingForm.addEventListener('submit', handleBooking);
@@ -1291,7 +1310,11 @@
         adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
         exportBtn.addEventListener('click', exportData);
         setupDbBtn.addEventListener('click', async function() {
-            if (JSONBLOB_ID) { showSetupResult(JSONBLOB_ID); return; }
+            if (JSONBLOB_ID) { 
+                showSetupResult(JSONBLOB_ID); 
+                alert('✅ قاعدة البيانات مفعلة بالفعل بالكود: ' + JSONBLOB_ID);
+                return; 
+            }
             await saveData();
             if (!JSONBLOB_ID) alert('حصل خطأ أثناء إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
         });
@@ -1308,6 +1331,7 @@
             if (e.key === 'Escape') { closeAdminPanel(); closeGroupsWindow(); }
         });
 
+        // 🔄 بدء المزامنة مع قاعدة البيانات المشتركة
         startSync();
     }
 
