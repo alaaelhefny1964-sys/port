@@ -636,6 +636,40 @@
             transform: scale(1.02);
         }
 
+        #syncStatus {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(45, 27, 61, 0.9);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            direction: ltr;
+            text-align: center;
+        }
+        #syncStatus .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        #syncStatus .dot.green { background: #06D6A0; }
+        #syncStatus .dot.red { background: #EF476F; }
+        #syncStatus .dot.yellow { background: #FFD166; }
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.4; transform: scale(0.8); }
+        }
+
         @keyframes fadeSlide {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -773,19 +807,23 @@
     </div>
 </div>
 
-<div style="margin-top:10px; font-size:0.8rem; color:#9b8aa0; text-align:center; max-width:700px;">
-    ⚡ جميع البيانات محفوظة في قاعدة بيانات مشتركة على الإنترنت، وتتحدث تلقائياً كل بضع ثوانٍ.
+<!-- مؤشر حالة المزامنة -->
+<div id="syncStatus">
+    <span class="dot green" id="syncDot"></span>
+    <span id="syncText">متصل</span>
+    <span style="margin:0 8px;color:#888;">|</span>
+    <span id="syncTime">جاري التحديث...</span>
 </div>
 
 <script>
     // ================================================================
-    //  🔗 قاعدة البيانات المشتركة - تم التهيئة مسبقاً بالكود التالي:
+    //  🔗 قاعدة البيانات المشتركة - كود التهيئة
     //  🔑 019fb999-ed4e-7689-bf22-f89a326e0f2c
     // ================================================================
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
-    const POLL_INTERVAL_MS = 5000;
-    
+    const POLL_INTERVAL_MS = 3000; // 3 ثواني للمزامنة السريعة
+
     function getBlobUrl() {
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
@@ -800,11 +838,33 @@
         { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
     ];
 
+    let isSaving = false;
+    let lastSyncTime = null;
+    let syncErrorCount = 0;
+
+    // --------------------- عناصر UI للمزامنة ---------------------
+    const syncDot = document.getElementById('syncDot');
+    const syncText = document.getElementById('syncText');
+    const syncTime = document.getElementById('syncTime');
+
+    function updateSyncStatus(status, message) {
+        if (status === 'connected') {
+            syncDot.className = 'dot green';
+            syncText.textContent = '🟢 متصل';
+        } else if (status === 'syncing') {
+            syncDot.className = 'dot yellow';
+            syncText.textContent = '🔄 جاري المزامنة...';
+        } else if (status === 'error') {
+            syncDot.className = 'dot red';
+            syncText.textContent = '🔴 خطأ في المزامنة';
+        }
+        if (message) syncTime.textContent = message;
+    }
+
     // ================================================================
     //  📥 تحميل البيانات من السيرفر (jsonblob.com)
     // ================================================================
     async function loadData() {
-        // تحميل النسخة المحلية كاحتياطي
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
@@ -812,29 +872,38 @@
             if (Array.isArray(lb)) bookings = lb;
         } catch (e) {}
 
-        // إذا لم يوجد كود قاعدة البيانات، نخرج
         if (!JSONBLOB_ID) return false;
-        
+
         try {
+            updateSyncStatus('syncing', 'جاري التحميل من السيرفر...');
             const res = await fetch(getBlobUrl(), {
                 headers: { 'Accept': 'application/json' }
             });
+            
             if (!res.ok) throw new Error('HTTP ' + res.status);
+            
             const data = await res.json();
             
-            // تحميل البيانات من السيرفر
-            groups = Array.isArray(data.groups) && data.groups.length ? data.groups : defaultGroups;
-            bookings = Array.isArray(data.bookings) ? data.bookings : [];
+            if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
+                groups = data.groups;
+            } else {
+                groups = defaultGroups;
+            }
             
-            // التأكد من وجود خاصية locked في كل مجموعة
+            bookings = Array.isArray(data.bookings) ? data.bookings : [];
             groups = groups.map(g => ({ ...g, locked: g.locked || false }));
             
-            // حفظ نسخة محلية
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
+            
+            lastSyncTime = new Date();
+            syncErrorCount = 0;
+            updateSyncStatus('connected', 'آخر تحديث: ' + lastSyncTime.toLocaleTimeString('ar-EG'));
             return true;
         } catch (err) {
             console.error('تعذر تحميل البيانات:', err);
+            syncErrorCount++;
+            updateSyncStatus('error', 'خطأ: ' + err.message);
             return false;
         }
     }
@@ -843,13 +912,15 @@
     //  📤 حفظ البيانات على السيرفر (jsonblob.com)
     // ================================================================
     async function saveData() {
-        // حفظ نسخة محلية
+        if (isSaving) return;
+        isSaving = true;
+
         localStorage.setItem('bookingGroups', JSON.stringify(groups));
         localStorage.setItem('bookingList', JSON.stringify(bookings));
 
-        // إذا لم يوجد كود، نحاول إنشاء قاعدة بيانات جديدة
         if (!JSONBLOB_ID) {
             try {
+                updateSyncStatus('syncing', 'إنشاء قاعدة بيانات جديدة...');
                 const res = await fetch('https://jsonblob.com/api/jsonBlob', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -866,13 +937,18 @@
                 }
             } catch (e) {
                 console.error('إنشاء Blob فشل', e);
+                isSaving = false;
+                return;
             }
         }
-        
-        if (!JSONBLOB_ID) return;
 
-        // حفظ على السيرفر
+        if (!JSONBLOB_ID) {
+            isSaving = false;
+            return;
+        }
+
         try {
+            updateSyncStatus('syncing', 'جاري الحفظ على السيرفر...');
             await fetch(getBlobUrl(), {
                 method: 'PUT',
                 headers: {
@@ -881,28 +957,45 @@
                 },
                 body: JSON.stringify({ groups, bookings })
             });
+            lastSyncTime = new Date();
+            syncErrorCount = 0;
+            updateSyncStatus('connected', 'تم الحفظ: ' + lastSyncTime.toLocaleTimeString('ar-EG'));
         } catch (err) {
             console.error('تعذر حفظ البيانات:', err);
-            alert('تم الحفظ على هذا الجهاز. فشل الإرسال للسحابة — تحقق من الإنترنت.');
+            syncErrorCount++;
+            updateSyncStatus('error', 'خطأ في الحفظ: ' + err.message);
         }
+        isSaving = false;
     }
 
     // ================================================================
     //  🔄 مزامنة البيانات مع السيرفر (تحديث دوري)
     // ================================================================
     async function refreshFromServer() {
-        await loadData();
-        renderGroups();
-        renderBookings();
-        if (adminModal.classList.contains('active')) renderAdminBookings();
-        if (groupsModal.classList.contains('active')) renderGroupsWindow();
+        const success = await loadData();
+        if (success) {
+            renderGroups();
+            renderBookings();
+            if (adminModal.classList.contains('active')) renderAdminBookings();
+            if (groupsModal.classList.contains('active')) renderGroupsWindow();
+        }
     }
 
     function startSync() {
         console.log('🔄 بدء المزامنة مع قاعدة البيانات المشتركة...');
         console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-        refreshFromServer();
-        setInterval(refreshFromServer, POLL_INTERVAL_MS);
+        updateSyncStatus('syncing', 'جاري الاتصال بقاعدة البيانات...');
+        
+        // تحميل فوري
+        refreshFromServer().then(() => {
+            console.log('✅ تم التحميل الأولي بنجاح');
+        });
+        
+        // مزامنة دورية
+        setInterval(async () => {
+            await refreshFromServer();
+        }, POLL_INTERVAL_MS);
+        
         console.log('✅ المزامنة تعمل كل', POLL_INTERVAL_MS / 1000, 'ثواني');
     }
 
@@ -1294,10 +1387,13 @@
         setTimeout(() => URL.revokeObjectURL(url), 2000);
     }
 
-    // --------------------- التهيئة ---------------------
+    // ================================================================
+    //  🚀 التهيئة والتشغيل
+    // ================================================================
     function init() {
         console.log('🚀 بدء تشغيل دفتر الحجوزات...');
         console.log('🔑 كود قاعدة البيانات المثبت:', JSONBLOB_ID);
+        console.log('📡 رابط قاعدة البيانات:', getBlobUrl());
         
         renderGroups();
         renderBookings();
@@ -1335,6 +1431,7 @@
         startSync();
     }
 
+    // تشغيل التطبيق
     init();
 </script>
 
