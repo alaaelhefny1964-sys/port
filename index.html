@@ -1042,261 +1042,225 @@
 
 <script>
     // ============================================================
-    // ============ تزامن تلقائي ثنائي الاتجاه (مُحسّن) ============
+    // ============ تزامن ذكي: المحلي أولاً، السيرفر ثانياً ============
     // ============================================================
-    const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
-    let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
-    const POLL_INTERVAL_MS = 5000;
+
+    // --- الإعدادات ---
+    const POLL_INTERVAL_MS = 8000; // كل 8 ثوانٍ
     let isAdmin = false;
-    let lastSyncStatus = 'idle'; // idle | success | error
+    let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
+    let lastKnownBookingsCount = 0;
 
     function getBlobUrl() {
-        return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
+        return JSONBLOB_ID ? 'https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID : '';
     }
 
-    // ============ مفتاح فريد للحجز (أكثر موثوقية) ============
+    // --- مفتاح فريد للحجز ---
     function bookingKey(b) {
-        // نستخدم الاسم + المجموعة + تليفون الطالب (أكثر استقراراً من الوقت)
         return (b.studentName || '') + '|' + (b.group || '') + '|' + (b.studentPhone || '');
     }
 
-    // ============ دمج ذكي: السيرفر أولاً ثم المحلي ============
-    function mergeBookings(remoteArr, localArr) {
-        // نبدأ بالسيرفر (المصدر الأحدث) ثم نضيف ما يوجد محلياً فقط
-        const merged = [...(remoteArr || [])];
-        const remoteKeys = new Set(merged.map(bookingKey));
-        (localArr || []).forEach(b => {
-            if (!remoteKeys.has(bookingKey(b))) {
-                merged.push(b);
-                remoteKeys.add(bookingKey(b));
+    // --- دمج بيانات: يضيف الجديد فقط (لا يحذف) ---
+    function mergeData(existing, incoming) {
+        const result = [...existing];
+        const keys = new Set(result.map(bookingKey));
+        (incoming || []).forEach(item => {
+            const k = bookingKey(item);
+            if (!keys.has(k)) {
+                result.push(item);
+                keys.add(k);
             }
         });
-        return merged;
+        return result;
     }
 
-    function mergeGroups(remoteArr, localArr) {
-        const merged = [];
-        const allNames = new Set([
-            ...(remoteArr || []).map(g => g.name),
-            ...(localArr || []).map(g => g.name)
-        ]);
-        allNames.forEach(name => {
-            const remoteG = (remoteArr || []).find(g => g.name === name);
-            const localG = (localArr || []).find(g => g.name === name);
-            if (remoteG && localG) {
-                // السيرفر أولوية، لكن إذا كانت السعة المحلية مختلفة نستخدم الأكبر
-                merged.push({
+    function mergeGroups(existing, incoming) {
+        const result = [];
+        const names = new Set([...existing.map(g => g.name), ...incoming.map(g => g.name)]);
+        names.forEach(name => {
+            const e = existing.find(g => g.name === name);
+            const i = incoming.find(g => g.name === name);
+            if (e && i) {
+                result.push({
                     name: name,
-                    capacity: Math.max(remoteG.capacity || 30, localG.capacity || 30),
-                    closed: remoteG.closed !== undefined ? remoteG.closed : (localG.closed !== undefined ? localG.closed : false)
+                    capacity: i.capacity || e.capacity || 30,
+                    closed: i.closed !== undefined ? i.closed : e.closed
                 });
-            } else if (remoteG) {
-                merged.push({...remoteG});
-            } else if (localG) {
-                merged.push({...localG});
+            } else if (i) {
+                result.push({...i});
+            } else if (e) {
+                result.push({...e});
             }
         });
-        return merged;
+        return result;
     }
 
-    // ============ تحديث مؤشر حالة الاتصال ============
-    function updateSyncStatus(status, message) {
-        lastSyncStatus = status;
+    // --- تحديث مؤشر الحالة ---
+    function setStatus(status, msg) {
         const el = document.getElementById('syncStatus');
         if (!el) return;
-        if (status === 'success') {
-            el.innerHTML = '🟢 متصل بالسيرفر — ' + (message || 'تم التزامن');
+        const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+        if (status === 'ok') {
+            el.innerHTML = '🟢 متصل — ' + (msg || 'مزامنة ناجحة') + ' (' + time + ')';
             el.style.color = '#06D6A0';
-        } else if (status === 'error') {
-            el.innerHTML = '🔴 غير متصل — ' + (message || 'يعمل بالوضع المحلي');
+        } else if (status === 'warn') {
+            el.innerHTML = '🟡 ' + (msg || 'يعمل محلياً') + ' (' + time + ')';
+            el.style.color = '#f0a500';
+        } else if (status === 'err') {
+            el.innerHTML = '🔴 ' + (msg || 'غير متصل') + ' (' + time + ')';
             el.style.color = '#EF476F';
-        } else if (status === 'syncing') {
+        } else if (status === 'sync') {
             el.innerHTML = '🟡 جاري التزامن...';
             el.style.color = '#f0a500';
-        } else {
-            el.innerHTML = '⚪ في انتظار الاتصال...';
-            el.style.color = '#9b8aa0';
         }
     }
 
-    // ============ إنشاء blob جديد ============
-    async function createNewBlob() {
+    // --- إنشاء blob جديد على السيرفر ---
+    async function createBlob() {
         try {
-            console.log('جاري إنشاء blob جديد...');
-            updateSyncStatus('syncing', 'جاري إنشاء رابط جديد...');
+            setStatus('sync', 'جاري إنشاء رابط...');
             const res = await fetch('https://jsonblob.com/api/jsonBlob', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ groups: groups || [], bookings: bookings || [] })
+                headers: {'Content-Type':'application/json','Accept':'application/json'},
+                body: JSON.stringify({groups: groups || [], bookings: bookings || []})
             });
-            if (res.ok) {
-                const loc = res.headers.get('Location') || res.headers.get('location') || '';
-                const id = loc.split('/').pop();
-                if (id) {
-                    JSONBLOB_ID = id;
-                    localStorage.setItem('bookingBlobId', id);
-                    console.log('✅ تم إنشاء blob جديد:', id);
-                    updateSyncStatus('success', 'تم إنشاء رابط جديد');
-                    return true;
-                }
-            }
-            throw new Error('فشل إنشاء blob: ' + res.status);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const loc = res.headers.get('Location') || res.headers.get('location') || '';
+            const id = loc.split('/').pop();
+            if (!id) throw new Error('لا يوجد ID في الرد');
+            JSONBLOB_ID = id;
+            localStorage.setItem('bookingBlobId', id);
+            console.log('✅ Blob جديد:', id);
+            setStatus('ok', 'تم إنشاء رابط جديد');
+            return true;
         } catch (e) {
-            console.error('❌ إنشاء Blob فشل:', e);
-            updateSyncStatus('error', 'فشل إنشاء رابط جديد');
+            console.warn('❌ فشل إنشاء Blob:', e.message);
+            setStatus('err', 'فشل إنشاء الرابط');
             return false;
         }
     }
 
-    // ============ تحميل البيانات (السيرفر أولاً) ============
-    async function loadData() {
-        updateSyncStatus('syncing');
-
-        // 1. قراءة المحلي (احتياطي)
-        let localGroups = [], localBookings = [];
+    // --- قراءة من السيرفر ---
+    async function fetchFromServer() {
+        if (!JSONBLOB_ID) return {ok: false, data: null};
         try {
-            const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
-            const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
-            if (Array.isArray(lg)) localGroups = lg;
-            if (Array.isArray(lb)) localBookings = lb;
-        } catch (e) {
-            console.warn('خطأ في قراءة localStorage:', e);
-        }
-
-        // 2. قراءة السيرفر
-        let remoteGroups = [], remoteBookings = [];
-        let serverOk = false;
-
-        if (!JSONBLOB_ID) {
-            console.log('لا يوجد JSONBLOB_ID، سيتم محاولة إنشاء واحد جديد...');
-            const created = await createNewBlob();
-            if (!created) {
-                groups = localGroups;
-                bookings = localBookings;
-                return false;
-            }
-        }
-
-        try {
-            console.log('جاري الاتصال بالسيرفر:', getBlobUrl());
             const res = await fetch(getBlobUrl(), {
-                headers: { 'Accept': 'application/json' },
+                headers: {'Accept':'application/json'},
                 cache: 'no-store'
             });
-
             if (res.status === 404) {
-                console.warn('⚠️ Blob غير موجود (404)، سيتم إنشاء blob جديد...');
-                const created = await createNewBlob();
-                if (created) {
-                    // بعد الإنشاء، نحاول القراءة مرة أخرى
-                    const res2 = await fetch(getBlobUrl(), {
-                        headers: { 'Accept': 'application/json' },
-                        cache: 'no-store'
-                    });
-                    if (res2.ok) {
-                        const data = await res2.json();
-                        if (Array.isArray(data.groups)) remoteGroups = data.groups;
-                        if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
-                        serverOk = true;
-                        updateSyncStatus('success', 'تم إنشاء رابط وتحميل البيانات');
-                    }
-                }
-            } else if (!res.ok) {
-                throw new Error('HTTP ' + res.status + ' ' + res.statusText);
-            } else {
-                const data = await res.json();
-                console.log('✅ تم الاتصال بالسيرفر بنجاح');
-
-                if (Array.isArray(data.groups)) remoteGroups = data.groups;
-                if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
-
-                serverOk = true;
-                updateSyncStatus('success', 'آخر تحديث: ' + new Date().toLocaleTimeString('ar-EG'));
+                console.warn('⚠️ Blob غير موجود (404)');
+                return {ok: false, code: 404};
             }
-
-        } catch (err) {
-            console.warn('⚠️ تعذر الاتصال بالسيرفر:', err.message);
-            updateSyncStatus('error', err.message);
-        }
-
-        // 3. دمج: السيرفر أولاً ثم المحلي
-        if (serverOk) {
-            groups = mergeGroups(remoteGroups, localGroups);
-            bookings = mergeBookings(remoteBookings, localBookings);
-            console.log('تم دمج البيانات — مجموعات:', groups.length, 'حجوزات:', bookings.length);
-        } else {
-            groups = localGroups;
-            bookings = localBookings;
-            console.log('الاعتماد على البيانات المحلية — مجموعات:', groups.length, 'حجوزات:', bookings.length);
-        }
-
-        // 4. حفظ النتيجة المدمجة محلياً
-        try {
-            localStorage.setItem('bookingGroups', JSON.stringify(groups));
-            localStorage.setItem('bookingList', JSON.stringify(bookings));
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            return {ok: true, data: data};
         } catch (e) {
-            console.warn('خطأ في حفظ localStorage:', e);
+            console.warn('⚠️ فشل الاتصال:', e.message);
+            return {ok: false, error: e.message};
         }
-
-        return serverOk;
     }
 
-    // ============ حفظ البيانات (سيرفر + محلي) ============
+    // --- رفع على السيرفر ---
+    async function pushToServer() {
+        if (!JSONBLOB_ID) {
+            const created = await createBlob();
+            if (!created) return false;
+        }
+        try {
+            const res = await fetch(getBlobUrl(), {
+                method: 'PUT',
+                headers: {'Content-Type':'application/json','Accept':'application/json'},
+                body: JSON.stringify({groups: groups, bookings: bookings})
+            });
+            if (res.status === 404) {
+                console.warn('⚠️ Blob محذوف، إنشاء جديد...');
+                const created = await createBlob();
+                if (!created) return false;
+                // حاول مرة ثانية
+                const res2 = await fetch(getBlobUrl(), {
+                    method: 'PUT',
+                    headers: {'Content-Type':'application/json','Accept':'application/json'},
+                    body: JSON.stringify({groups: groups, bookings: bookings})
+                });
+                return res2.ok;
+            }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            console.log('✅ تم الرفع على السيرفر');
+            return true;
+        } catch (e) {
+            console.warn('⚠️ فشل الرفع:', e.message);
+            return false;
+        }
+    }
+
+    // --- تحميل البيانات (المحلي أولاً) ---
+    async function loadData() {
+        // 1. اقرأ المحلي دائماً
+        let localG = [], localB = [];
+        try {
+            const g = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
+            const b = JSON.parse(localStorage.getItem('bookingList') || 'null');
+            if (Array.isArray(g)) localG = g;
+            if (Array.isArray(b)) localB = b;
+        } catch (e) {}
+
+        groups = localG;
+        bookings = localB;
+
+        // 2. حاول اقرأ السيرفر
+        setStatus('sync');
+        const server = await fetchFromServer();
+
+        if (server.ok && server.data) {
+            // دمج: المحلي + السيرفر
+            const sGroups = Array.isArray(server.data.groups) ? server.data.groups : [];
+            const sBookings = Array.isArray(server.data.bookings) ? server.data.bookings : [];
+
+            groups = mergeGroups(localG, sGroups);
+            bookings = mergeData(localB, sBookings);
+
+            // حفظ النتيجة محلياً
+            try {
+                localStorage.setItem('bookingGroups', JSON.stringify(groups));
+                localStorage.setItem('bookingList', JSON.stringify(bookings));
+            } catch (e) {}
+
+            setStatus('ok', 'تم التزامن مع السيرفر');
+            console.log('✅ تم الدمج — مجموعات:', groups.length, 'حجوزات:', bookings.length);
+        } else if (server.code === 404) {
+            // Blob غير موجود → أنشئ جديد
+            setStatus('warn', 'إنشاء رابط جديد...');
+            await createBlob();
+            // ارفع البيانات المحلية الحالية
+            await pushToServer();
+        } else {
+            // فشل الاتصال → استخدم المحلي فقط
+            setStatus('warn', 'يعمل بالوضع المحلي');
+            console.log('⚠️ وضع محلي — مجموعات:', groups.length, 'حجوزات:', bookings.length);
+        }
+
+        lastKnownBookingsCount = bookings.length;
+    }
+
+    // --- حفظ البيانات (محلي + محاولة سيرفر) ---
     async function saveData() {
         // 1. حفظ محلي فوراً
         try {
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
-            console.log('✅ تم الحفظ محلياً');
-        } catch (e) {
-            console.warn('خطأ في حفظ localStorage:', e);
-        }
+        } catch (e) {}
 
-        // 2. إنشاء blob جديد إن لم يكن موجوداً أو إذا كان 404
-        if (!JSONBLOB_ID) {
-            const created = await createNewBlob();
-            if (!created) return;
-        }
-
-        // 3. رفع على السيرفر
-        try {
-            console.log('جاري الرفع على السيرفر:', getBlobUrl());
-            const res = await fetch(getBlobUrl(), {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ groups, bookings })
-            });
-            if (res.ok) {
-                console.log('✅ تم الرفع على السيرفر بنجاح');
-                updateSyncStatus('success', 'تم الحفظ على السيرفر');
-            } else if (res.status === 404) {
-                console.warn('⚠️ Blob غير موجود أثناء الحفظ (404)، سيتم إنشاء blob جديد...');
-                const created = await createNewBlob();
-                if (created) {
-                    // حاول مرة أخرى
-                    const res2 = await fetch(getBlobUrl(), {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ groups, bookings })
-                    });
-                    if (res2.ok) {
-                        updateSyncStatus('success', 'تم الحفظ بعد إنشاء رابط جديد');
-                    } else {
-                        throw new Error('HTTP ' + res2.status);
-                    }
-                }
-            } else {
-                throw new Error('HTTP ' + res.status);
-            }
-        } catch (err) {
-            console.warn('⚠️ تعذر الحفظ على السيرفر:', err.message);
-            updateSyncStatus('error', 'لم يُحفظ على السيرفر');
+        // 2. محاولة رفع على السيرفر (بدون انتظار)
+        const pushed = await pushToServer();
+        if (pushed) {
+            setStatus('ok', 'تم الحفظ والمزامنة');
+        } else {
+            setStatus('warn', 'محفوظ محلياً فقط');
         }
     }
 
-    // ============ تحديث دوري من السيرفر ============
-    let knownBookingKeys = null;
-
+    // --- تحديث دوري ---
     async function refreshFromServer() {
         console.log('=== تحديث دوري ===');
         await loadData();
@@ -1304,27 +1268,20 @@
         renderBookings();
         if (document.getElementById('adminModal').classList.contains('active')) renderAdminBookings();
         if (document.getElementById('groupsModal').classList.contains('active')) renderGroupsWindow();
-        checkForNewBookings();
+
+        // إشعار بالجديد
+        if (bookings.length > lastKnownBookingsCount) {
+            const newOnes = bookings.slice(lastKnownBookingsCount);
+            newOnes.forEach(b => {
+                showToast('🎉 تسجيل جديد', 'الطالب <strong>' + b.studentName + '</strong> سجل في "' + b.group + '"');
+            });
+            lastKnownBookingsCount = bookings.length;
+        }
     }
 
     function startSync() {
         refreshFromServer();
         setInterval(refreshFromServer, POLL_INTERVAL_MS);
-    }
-
-    function checkForNewBookings() {
-        const currentKeys = new Set(bookings.map(bookingKey));
-        if (knownBookingKeys === null) {
-            knownBookingKeys = currentKeys;
-            return;
-        }
-        bookings.forEach(b => {
-            const key = bookingKey(b);
-            if (!knownBookingKeys.has(key)) {
-                showToast('🎉 تسجيل جديد', 'الطالب <strong>' + b.studentName + '</strong> سجل في مجموعة "' + b.group + '"');
-            }
-        });
-        knownBookingKeys = currentKeys;
     }
     // ============================================================
     // ============ DONNÉES ============
@@ -2176,9 +2133,9 @@ async function init() {
         });
         importFileBtn.addEventListener('click', importDataFromFile);
         document.getElementById('manualSyncBtn').addEventListener('click', async function() {
-            updateSyncStatus('syncing', 'جاري التحديث اليدوي...');
+            setStatus('sync', 'جاري التحديث اليدوي...');
             await refreshFromServer();
-            showToast('✅ تم التحديث', 'تم تحديث البيانات من السيرفر يدوياً');
+            showToast('✅ تم التحديث', 'تم تحديث البيانات');
         });
 
         document.getElementById('fileInput').addEventListener('keypress', function(e) {
