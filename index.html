@@ -37,6 +37,7 @@
         .dot3 { background: #9B5DE5; }
         .dot4 { background: #EF476F; }
         .dot5 { background: #118AB2; }
+
         .welcome-banner {
             background: #2d1b3d;
             padding: 16px 40px;
@@ -57,13 +58,14 @@
             text-shadow: 0 0 20px rgba(243, 156, 18, 0.2);
             margin: 0;
         }
+
         .notebook {
             max-width: 820px;
             width: 100%;
             background: #fffdf7;
             border-radius: 30px;
             padding: 30px 35px 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
             border: 1px solid rgba(255, 215, 140, 0.4);
             position: relative;
             margin-bottom: 30px;
@@ -102,9 +104,8 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
+
+        .form-group { margin-bottom: 20px; }
         .form-group label {
             display: block;
             font-weight: 700;
@@ -135,9 +136,8 @@
             flex-wrap: wrap;
             gap: 18px;
         }
-        .form-row .form-group {
-            flex: 1 1 200px;
-        }
+        .form-row .form-group { flex: 1 1 200px; }
+
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -158,6 +158,7 @@
             transform: scale(1.01);
             box-shadow: 0 14px 28px -8px #9B5DE5;
         }
+
         .confirmation-box {
             background: #e1f7f0;
             border-radius: 28px;
@@ -190,6 +191,11 @@
             color: #0a4b3a;
             margin: 12px 0;
         }
+        .confirmation-box .small-note {
+            font-weight: 400;
+            color: #1f6b56;
+        }
+
         .whatsapp-btn {
             display: inline-block;
             background: linear-gradient(135deg, #25D366, #128C7E);
@@ -229,6 +235,7 @@
             font-family: 'Cairo', sans-serif;
         }
         .copy-link-btn:hover { background: #d7c7ec; }
+
         .groups-manager {
             background: #faf3ee;
             border-radius: 24px;
@@ -247,7 +254,6 @@
             flex-wrap: wrap;
             gap: 10px;
             margin: 12px 0;
-            min-height: 40px;
         }
         .group-tag {
             background: #ffffff;
@@ -261,116 +267,6 @@
             color: #3d2a4b;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
-        .group-tag .group-name-only {
-            font-weight: 600;
-            color: #3d2a4b;
-        }
-        .toast-container {
-            position: fixed;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 420px;
-            padding: 0 16px;
-            pointer-events: none;
-        }
-        .toast {
-            background: #2d1b3d;
-            color: #fef3d7;
-            padding: 14px 20px;
-            border-radius: 18px;
-            border-right: 6px solid #06D6A0;
-            box-shadow: 0 12px 26px rgba(0,0,0,0.3);
-            font-weight: 600;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            animation: toastIn 0.35s ease, toastOut 0.4s ease 5.6s forwards;
-            pointer-events: auto;
-        }
-        .toast .toast-title {
-            display: block;
-            font-weight: 800;
-            color: #FFD166;
-            margin-bottom: 2px;
-            font-size: 0.85rem;
-            letter-spacing: 0.3px;
-        }
-        @keyframes toastIn {
-            0% { opacity: 0; transform: translateY(-16px) scale(0.97); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes toastOut {
-            0% { opacity: 1; max-height: 100px; margin-bottom: 10px; }
-            100% { opacity: 0; max-height: 0; margin-bottom: 0; padding-top:0; padding-bottom:0; overflow:hidden; }
-        }
-        .group-tag.closed {
-            border-color: #f0b3b3;
-            background: #fff3f3;
-            opacity: 0.85;
-        }
-        .group-tag .lock-group {
-            background: #fff1cf;
-            border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-weight: 800;
-            color: #a06d00;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-        }
-        .group-tag .lock-group:hover {
-            background: #ffe1a1;
-            transform: scale(1.1);
-        }
-        .group-tag.closed .lock-group {
-            background: #06D6A0;
-            color: white;
-        }
-        .group-tag.closed .lock-group:hover { background: #05b88a; }
-        .group-tag .lock-group.admin-only {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .gw-lock-btn {
-            background: #fff1cf;
-            border: none;
-            border-radius: 30px;
-            padding: 4px 14px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #a06d00;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Cairo', sans-serif;
-        }
-        .gw-lock-btn:hover { background: #ffe1a1; }
-        .gw-lock-btn.admin-only {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .group-window-card.closed {
-            border-right-color: #a06d00;
-            background: #fffaf0;
-        }
-        .group-window-card.closed .gw-count {
-            color: #a06d00;
-            background: #fff1cf;
-        }
-        .group-window-card.closed .gw-lock-btn {
-            background: #06D6A0;
-            color: white;
-        }
-        .group-window-card.closed .gw-lock-btn:hover { background: #05b88a; }
         .group-tag .del-group {
             background: #ffd8d8;
             border: none;
@@ -390,10 +286,17 @@
             background: #ffb3b3;
             transform: scale(1.1);
         }
-        .group-tag .del-group.admin-only {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .group-tag .lock-toggle {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: 0.2s;
         }
+        .group-tag .lock-toggle:hover { transform: scale(1.2); }
+        .group-tag.locked { border-color: #EF476F; background: #fff0f0; }
+
         .add-group-form {
             display: flex;
             gap: 10px;
@@ -420,11 +323,8 @@
             font-family: 'Cairo', sans-serif;
         }
         .add-group-form button:hover { background: #7d44b8; }
-        .add-group-form button.admin-only {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
         .add-group-form input[type="number"] { flex: 0 0 130px; }
+
         .group-window-card {
             background: #fcf8f2;
             border-radius: 20px;
@@ -433,10 +333,8 @@
             border-right: 6px solid #06D6A0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .group-window-card.full {
-            border-right-color: #EF476F;
-            background: #fdf1f1;
-        }
+        .group-window-card.full { border-right-color: #EF476F; background: #fdf1f1; }
+        .group-window-card.locked-manual { border-right-color: #f39c12; background: #fff8e8; }
         .gw-header {
             display: flex;
             justify-content: space-between;
@@ -445,11 +343,7 @@
             gap: 8px;
             margin-bottom: 10px;
         }
-        .gw-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #2d1b3d;
-        }
+        .gw-name { font-size: 1.1rem; font-weight: 800; color: #2d1b3d; }
         .gw-count {
             font-size: 0.95rem;
             font-weight: 700;
@@ -461,6 +355,10 @@
         .group-window-card.full .gw-count {
             color: #b0003a;
             background: #ffe1e8;
+        }
+        .group-window-card.locked-manual .gw-count {
+            color: #b7791f;
+            background: #fff0d0;
         }
         .gw-progress {
             width: 100%;
@@ -479,45 +377,16 @@
         .group-window-card.full .gw-progress-bar {
             background: linear-gradient(135deg, #EF476F, #d63d5f);
         }
-        .gw-students {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+        .group-window-card.locked-manual .gw-progress-bar {
+            background: linear-gradient(135deg, #f39c12, #d68910);
         }
+        .gw-students { display: flex; flex-direction: column; gap: 6px; }
         .gw-student {
             font-size: 0.9rem;
             color: #3d2a4b;
             background: #ede5f0;
             padding: 6px 14px;
             border-radius: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .gw-student .del-student-btn {
-            background: #ffd8d8;
-            border: none;
-            border-radius: 50%;
-            width: 26px;
-            height: 26px;
-            font-weight: 800;
-            color: #b0003a;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .gw-student .del-student-btn:hover {
-            background: #ffb3b3;
-            transform: scale(1.1);
-        }
-        .gw-student .del-student-btn.admin-only {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
         .gw-empty {
             font-size: 0.9rem;
@@ -525,6 +394,7 @@
             text-align: center;
             padding: 10px 0;
         }
+
         .bookings-section { margin-top: 30px; }
         .bookings-section h3 {
             color: #3d2a4b;
@@ -537,6 +407,7 @@
             align-items: center;
             gap: 10px;
         }
+
         .booking-card {
             background: #fcf8f2;
             border-radius: 20px;
@@ -571,19 +442,43 @@
             color: #7a5e7e;
             margin-top: 6px;
         }
+        .booking-card .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .booking-card .actions button {
+            border: none;
+            border-radius: 30px;
+            padding: 4px 16px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .booking-card .actions .edit-btn {
+            background: #FFD166;
+            color: #5f2d8a;
+        }
+        .booking-card .actions .edit-btn:hover { background: #f7c04a; }
+        .booking-card .actions .delete-btn {
+            background: #EF476F;
+            color: white;
+        }
+        .booking-card .actions .delete-btn:hover { background: #d63d5f; }
+
         .no-bookings {
             color: #7a5e7e;
             text-align: center;
             padding: 30px 0;
             font-weight: 600;
         }
+
         .admin-btn-container {
             text-align: center;
             margin: 15px 0 5px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
         }
         .admin-btn {
             background: linear-gradient(135deg, #2d1b3d, #5f2d8a);
@@ -602,28 +497,7 @@
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(95, 45, 138, 0.4);
         }
-        .admin-btn.green {
-            background: linear-gradient(135deg, #06D6A0, #0bbf8a);
-            box-shadow: 0 4px 12px rgba(6, 214, 160, 0.3);
-        }
-        .admin-btn.green:hover {
-            box-shadow: 0 6px 20px rgba(6, 214, 160, 0.4);
-        }
-        .admin-btn.orange {
-            background: linear-gradient(135deg, #FFD166, #f0a500);
-            box-shadow: 0 4px 12px rgba(255, 209, 102, 0.3);
-            color: #2d1b3d;
-        }
-        .admin-btn.orange:hover {
-            box-shadow: 0 6px 20px rgba(255, 209, 102, 0.4);
-        }
-        .admin-btn.danger {
-            background: linear-gradient(135deg, #EF476F, #b0003a);
-            box-shadow: 0 4px 12px rgba(239, 71, 111, 0.4);
-        }
-        .admin-btn.danger:hover {
-            box-shadow: 0 6px 20px rgba(239, 71, 111, 0.5);
-        }
+
         .modal-overlay {
             display: none;
             position: fixed;
@@ -647,7 +521,7 @@
             max-height: 80vh;
             overflow-y: auto;
             padding: 30px 25px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
             animation: fadeSlide 0.4s ease;
             position: relative;
         }
@@ -693,13 +567,7 @@
             margin-bottom: 12px;
             border-right: 5px solid #9B5DE5;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
         }
-        .modal-booking-card .m-info { flex: 1; }
         .modal-booking-card .m-name {
             font-weight: 800;
             font-size: 1.1rem;
@@ -723,30 +591,6 @@
             font-size: 0.75rem;
             color: #7a5e7e;
             margin-top: 4px;
-        }
-        .modal-booking-card .m-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .modal-booking-card .del-student-btn {
-            background: #ffd8d8;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-weight: 800;
-            color: #b0003a;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-booking-card .del-student-btn:hover {
-            background: #ffb3b3;
-            transform: scale(1.1);
         }
         .modal-empty {
             text-align: center;
@@ -791,94 +635,22 @@
             background: #05b88a;
             transform: scale(1.02);
         }
-        .modal-export-btn.danger {
-            background: linear-gradient(135deg, #EF476F, #b0003a);
-        }
-        .modal-export-btn.danger:hover {
-            background: linear-gradient(135deg, #d63d5f, #8f002e);
-        }
-        .empty-groups-msg {
-            color: #7a5e7e;
-            text-align: center;
-            padding: 15px 0;
-            font-weight: 600;
-            width: 100%;
-        }
-        .import-section {
-            background: #f0f7ff;
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            border: 2px dashed #9B5DE5;
-        }
-        .import-section h4 {
-            color: #5f2d8a;
-            margin-bottom: 12px;
-        }
-        .import-section .file-input-wrapper {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .import-section input[type="file"] {
-            flex: 1;
-            min-width: 200px;
-            padding: 10px;
-            border: 2px solid #dcccdb;
-            border-radius: 30px;
-            font-family: 'Cairo', sans-serif;
-            background: white;
-        }
-        .import-section .import-btn {
-            background: #9B5DE5;
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Cairo', sans-serif;
-        }
-        .import-section .import-btn:hover { background: #7d44b8; }
-        .admin-lock-icon {
-            display: inline-block;
-            background: #2d1b3d;
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 10px;
-            border-radius: 30px;
-            margin-right: 8px;
-            font-weight: 700;
-        }
-        .admin-mode-badge {
-            display: inline-block;
-            background: #06D6A0;
-            color: white;
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-right: 8px;
-        }
+
         @keyframes fadeSlide {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
         @media (max-width: 600px) {
             .notebook { padding: 20px 15px; }
             .notebook-header h1 { font-size: 1.9rem; }
             .welcome-banner h2 { font-size: 1.6rem; }
             .stamp { font-size: 1.2rem; padding: 4px 16px; }
             .modal-content { padding: 20px 15px; }
-            .modal-booking-card { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
-
-<div class="toast-container" id="toastContainer"></div>
 
 <div class="decorative-dots">
     <span class="dot1"></span>
@@ -941,24 +713,20 @@
         <div class="stamp">✓ تم التسجيل</div>
         <p>تم تسجيل بياناتك بالكامل، برجاء انتظار تفعيل الحجز</p>
         <div class="action-group">
-            <a href="#" id="whatsappShareBtn" class="whatsapp-btn" target="_blank">
-                📱 إرسال إشعار للإدارة على واتساب
-            </a>
+            <a href="#" id="whatsappShareBtn" class="whatsapp-btn" target="_blank">📱 إرسال إشعار للإدارة على واتساب</a>
             <button id="copyLinkBtn" class="copy-link-btn">📋 نسخ رابط الحجز</button>
         </div>
     </div>
 
     <div class="groups-manager" id="groupsManager">
-        <h3>📚 إدارة المجموعات <span id="adminModeBadge"></span></h3>
+        <h3>📚 إدارة المجموعات</h3>
         <div id="groupTagsContainer" class="group-tags"></div>
-        <div class="add-group-form" id="addGroupForm">
+        <div class="add-group-form">
             <input type="text" id="newGroupInput" placeholder="اسم مجموعة جديدة...">
             <input type="number" id="newGroupCapacityInput" placeholder="الحد الأقصى" min="1" value="30">
             <button id="addGroupBtn">➕ إضافة</button>
         </div>
-        <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">
-            المجموعات المضافة تظهر في قائمة الحجز. الحد الأقصى الافتراضي 30 طالب، وتُقفل المجموعة تلقائياً عند اكتمال العدد.
-        </p>
+        <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">🔒 يمكنك قفل أي مجموعة يدوياً من زر القفل 🔓/🔒 بجانب كل مجموعة (للمدير فقط).</p>
     </div>
 
     <div class="bookings-section" id="bookingsSection">
@@ -967,61 +735,35 @@
     </div>
 
     <div class="admin-btn-container">
-        <button class="admin-btn" id="adminPanelBtn">🔐 دخول المدير</button>
-        <button class="admin-btn green" id="groupsWindowBtn">📚 عرض المجموعات</button>
-        <button class="admin-btn orange" id="exportDataBtn">📥 تصدير البيانات</button>
-        <button class="admin-btn" id="importDataBtn" style="background:linear-gradient(135deg, #FF6B6B, #ee5a24);">📤 استيراد البيانات</button>
+        <button class="admin-btn" id="adminPanelBtn">🔐 لوحة التحكم - المشرف</button>
+        <button class="admin-btn" id="groupsWindowBtn" style="background:linear-gradient(135deg, #06D6A0, #0bbf8a);">📚 عرض المجموعات والمقاعد</button>
     </div>
 </div>
 
-<!-- نافذة استيراد البيانات -->
-<div class="modal-overlay" id="importModal">
-    <div class="modal-content">
-        <button class="modal-close" id="importModalCloseBtn">✕</button>
-        <h2>📤 استيراد البيانات</h2>
-        <p class="subtitle">قم برفع ملف JSON لاستيراد المجموعات والحجوزات</p>
-
-        <div class="import-section">
-            <h4>📂 اختر ملف البيانات</h4>
-            <div class="file-input-wrapper">
-                <input type="file" id="fileInput" accept=".json">
-                <button class="import-btn" id="importFileBtn">📤 استيراد</button>
-            </div>
-            <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">
-                ⚠️ سيتم استبدال جميع البيانات الحالية بالبيانات الموجودة في الملف.
-            </p>
-            <div id="importStatus" style="margin-top:10px; font-weight:700; color:#5f2d8a;"></div>
-        </div>
-
-        <div style="text-align:center; margin-top:20px;">
-            <button class="modal-export-btn" id="importModalCloseBtn2" style="background:#9B5DE5;">إغلاق</button>
-        </div>
-    </div>
-</div>
-
+<!-- Modal لوحة التحكم -->
 <div class="modal-overlay" id="adminModal">
     <div class="modal-content">
         <button class="modal-close" id="modalCloseBtn">✕</button>
         <h2>📊 لوحة تحكم المشرف</h2>
         <p class="subtitle">جميع الحجوزات المسجلة من جميع الأجهزة</p>
-
         <div class="modal-stats" id="modalStats">
             <div class="stat-item">📌 إجمالي الحجوزات: <span id="totalCount">0</span></div>
             <div class="stat-item">📚 عدد المجموعات: <span id="groupCount">0</span></div>
         </div>
-
         <div id="modalBookingsList"></div>
-
-        <div style="text-align:center; margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+        <div style="text-align:center; margin-top: 15px;">
             <button class="modal-export-btn" id="exportBtn">📥 تنزيل البيانات (Excel + نص)</button>
-            <button class="modal-export-btn danger" id="clearAllBtn">🗑️ تفريغ البرنامج بالكامل</button>
+            <button class="modal-export-btn" id="setupDbBtn" style="background:linear-gradient(135deg,#9B5DE5,#EF476F); margin-inline-start:8px;">🔧 تهيئة قاعدة البيانات المشتركة</button>
         </div>
-        <p style="font-size:0.78rem; color:#9b8aa0; text-align:center; margin-top:10px;">
-            ⚠️ زر "تفريغ البرنامج" يحذف جميع الحجوزات والمجموعات بشكل نهائي.
-        </p>
+        <div id="setupResultBox" style="display:none; margin-top:14px; background:#fff9e6; border:2px solid #FFD166; border-radius:16px; padding:14px 16px; text-align:center;">
+            <div style="font-size:0.85rem; font-weight:700; color:#5f2d8a; margin-bottom:8px;">كود قاعدة البيانات - انسخه وابعته في الشات:</div>
+            <input id="setupResultInput" type="text" readonly style="width:100%; text-align:center; direction:ltr; font-size:1rem; font-weight:800; padding:10px; border-radius:10px; border:2px solid #9B5DE5; background:#fff; color:#2d1b3d;">
+            <button id="setupCopyBtn" type="button" style="margin-top:10px; background:#06D6A0; color:#fff; border:none; padding:8px 20px; border-radius:30px; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif;">📋 نسخ الكود</button>
+        </div>
     </div>
 </div>
 
+<!-- Modal عرض المجموعات والمقاعد -->
 <div class="modal-overlay" id="groupsModal">
     <div class="modal-content">
         <button class="modal-close" id="groupsModalCloseBtn">✕</button>
@@ -1032,459 +774,133 @@
 </div>
 
 <div style="margin-top:10px; font-size:0.8rem; color:#9b8aa0; text-align:center; max-width:700px;">
-    <div style="margin-top:15px; font-size:0.85rem; text-align:center; max-width:700px; background:#fffdf7; padding:10px 20px; border-radius:30px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-    <span id="syncStatus">⚪ في انتظار الاتصال...</span>
-    <button id="manualSyncBtn" style="background:#9B5DE5; color:white; border:none; padding:4px 14px; border-radius:20px; font-weight:700; font-size:0.75rem; cursor:pointer; margin-right:8px; font-family:'Cairo',sans-serif;">🔄 تحديث الآن</button>
-</div>
-
-⚡ جميع البيانات محفوظة في قاعدة بيانات مشتركة على الإنترنت، وتتحدث تلقائياً كل بضع ثوانٍ عند أي شخص يفتح نفس الرابط من أي جهاز.
+    ⚡ جميع البيانات محفوظة في قاعدة بيانات مشتركة على الإنترنت، وتتحدث تلقائياً كل بضع ثوانٍ.
 </div>
 
 <script>
-    // ============================================================
-    // ============ تزامن ذكي: المحلي أولاً، السيرفر ثانياً ============
-    // ============================================================
-
-    // --- الإعدادات ---
-    const POLL_INTERVAL_MS = 8000; // كل 8 ثوانٍ
-    let isAdmin = false;
-    let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
-    let lastKnownBookingsCount = 0;
-    let knownBookingKeys = null;
-
+    // --------------------- قاعدة البيانات المشتركة ---------------------
+    const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
+    let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
+    const POLL_INTERVAL_MS = 5000;
     function getBlobUrl() {
-        return JSONBLOB_ID ? 'https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID : '';
+        return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
 
-    // --- مفتاح فريد للحجز ---
-    function bookingKey(b) {
-        return (b.studentName || '') + '|' + (b.group || '') + '|' + (b.studentPhone || '');
-    }
+    // --------------------- بيانات التطبيق ---------------------
+    let groups = [];
+    let bookings = [];
+    const DEFAULT_CAPACITY = 30;
+    const defaultGroups = [
+        { name: 'مجموعة السبت 4 عصر', capacity: DEFAULT_CAPACITY, locked: false },
+        { name: 'مجموعة الأحد 6 مساء', capacity: DEFAULT_CAPACITY, locked: false },
+        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
+    ];
 
-    // --- دمج بيانات: يضيف الجديد فقط (لا يحذف) ---
-    function mergeData(existing, incoming) {
-        const result = [...existing];
-        const keys = new Set(result.map(bookingKey));
-        (incoming || []).forEach(item => {
-            const k = bookingKey(item);
-            if (!keys.has(k)) {
-                result.push(item);
-                keys.add(k);
-            }
-        });
-        return result;
-    }
-
-    function mergeGroups(existing, incoming) {
-        const result = [];
-        const names = new Set([...existing.map(g => g.name), ...incoming.map(g => g.name)]);
-        names.forEach(name => {
-            const e = existing.find(g => g.name === name);
-            const i = incoming.find(g => g.name === name);
-            if (e && i) {
-                result.push({
-                    name: name,
-                    capacity: i.capacity || e.capacity || 30,
-                    closed: i.closed !== undefined ? i.closed : e.closed
-                });
-            } else if (i) {
-                result.push({...i});
-            } else if (e) {
-                result.push({...e});
-            }
-        });
-        return result;
-    }
-
-    // --- تحديث مؤشر الحالة ---
-    function setStatus(status, msg) {
-        const el = document.getElementById('syncStatus');
-        if (!el) return;
-        const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-        if (status === 'ok') {
-            el.innerHTML = '🟢 متصل — ' + (msg || 'مزامنة ناجحة') + ' (' + time + ')';
-            el.style.color = '#06D6A0';
-        } else if (status === 'warn') {
-            el.innerHTML = '🟡 ' + (msg || 'يعمل محلياً') + ' (' + time + ')';
-            el.style.color = '#f0a500';
-        } else if (status === 'err') {
-            el.innerHTML = '🔴 ' + (msg || 'غير متصل') + ' (' + time + ')';
-            el.style.color = '#EF476F';
-        } else if (status === 'sync') {
-            el.innerHTML = '🟡 جاري التزامن...';
-            el.style.color = '#f0a500';
-        }
-    }
-
-    // --- إنشاء blob جديد على السيرفر ---
-    async function createBlob() {
+    // تحميل البيانات من السيرفر
+    async function loadData() {
         try {
-            setStatus('sync', 'جاري إنشاء رابط...');
-            const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json','Accept':'application/json'},
-                body: JSON.stringify({groups: groups || [], bookings: bookings || []})
-            });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const loc = res.headers.get('Location') || res.headers.get('location') || '';
-            const id = loc.split('/').pop();
-            if (!id) throw new Error('لا يوجد ID في الرد');
-            JSONBLOB_ID = id;
-            localStorage.setItem('bookingBlobId', id);
-            console.log('✅ Blob جديد:', id);
-            setStatus('ok', 'تم إنشاء رابط جديد');
-            return true;
-        } catch (e) {
-            console.warn('❌ فشل إنشاء Blob:', e.message);
-            setStatus('err', 'فشل إنشاء الرابط');
-            return false;
-        }
-    }
+            const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
+            const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
+            if (Array.isArray(lg) && lg.length) groups = lg;
+            if (Array.isArray(lb)) bookings = lb;
+        } catch (e) {}
 
-    // --- قراءة من السيرفر ---
-    async function fetchFromServer() {
-        if (!JSONBLOB_ID) return {ok: false, data: null};
+        if (!JSONBLOB_ID) return false;
         try {
             const res = await fetch(getBlobUrl(), {
-                headers: {'Accept':'application/json'},
-                cache: 'no-store'
+                headers: { 'Accept': 'application/json' }
             });
-            if (res.status === 404) {
-                console.warn('⚠️ Blob غير موجود (404)');
-                return {ok: false, code: 404};
-            }
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
-            return {ok: true, data: data};
-        } catch (e) {
-            console.warn('⚠️ فشل الاتصال:', e.message);
-            return {ok: false, error: e.message};
-        }
-    }
-
-    // --- رفع على السيرفر ---
-    async function pushToServer() {
-        if (!JSONBLOB_ID) {
-            const created = await createBlob();
-            if (!created) return false;
-        }
-        try {
-            const res = await fetch(getBlobUrl(), {
-                method: 'PUT',
-                headers: {'Content-Type':'application/json','Accept':'application/json'},
-                body: JSON.stringify({groups: groups, bookings: bookings})
-            });
-            if (res.status === 404) {
-                console.warn('⚠️ Blob محذوف، إنشاء جديد...');
-                const created = await createBlob();
-                if (!created) return false;
-                // حاول مرة ثانية
-                const res2 = await fetch(getBlobUrl(), {
-                    method: 'PUT',
-                    headers: {'Content-Type':'application/json','Accept':'application/json'},
-                    body: JSON.stringify({groups: groups, bookings: bookings})
-                });
-                return res2.ok;
-            }
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            console.log('✅ تم الرفع على السيرفر');
+            groups = Array.isArray(data.groups) && data.groups.length ? data.groups : defaultGroups;
+            bookings = Array.isArray(data.bookings) ? data.bookings : [];
+            // التأكد من وجود خاصية locked في كل مجموعة
+            groups = groups.map(g => ({ ...g, locked: g.locked || false }));
+            localStorage.setItem('bookingGroups', JSON.stringify(groups));
+            localStorage.setItem('bookingList', JSON.stringify(bookings));
             return true;
-        } catch (e) {
-            console.warn('⚠️ فشل الرفع:', e.message);
+        } catch (err) {
+            console.error('تعذر تحميل البيانات:', err);
             return false;
         }
     }
 
-    // --- تحميل البيانات (المحلي أولاً) ---
-    async function loadData() {
-        // 1. اقرأ المحلي دائماً
-        let localG = [], localB = [];
-        try {
-            const g = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
-            const b = JSON.parse(localStorage.getItem('bookingList') || 'null');
-            if (Array.isArray(g)) localG = g;
-            if (Array.isArray(b)) localB = b;
-        } catch (e) {}
-
-        groups = localG;
-        bookings = localB;
-
-        // 2. حاول اقرأ السيرفر
-        setStatus('sync');
-        const server = await fetchFromServer();
-
-        if (server.ok && server.data) {
-            // دمج: المحلي + السيرفر
-            const sGroups = Array.isArray(server.data.groups) ? server.data.groups : [];
-            const sBookings = Array.isArray(server.data.bookings) ? server.data.bookings : [];
-
-            groups = mergeGroups(localG, sGroups);
-            bookings = mergeData(localB, sBookings);
-
-            // حفظ النتيجة محلياً
-            try {
-                localStorage.setItem('bookingGroups', JSON.stringify(groups));
-                localStorage.setItem('bookingList', JSON.stringify(bookings));
-            } catch (e) {}
-
-            setStatus('ok', 'تم التزامن مع السيرفر');
-            console.log('✅ تم الدمج — مجموعات:', groups.length, 'حجوزات:', bookings.length);
-        } else if (server.code === 404) {
-            // Blob غير موجود → أنشئ جديد
-            setStatus('warn', 'إنشاء رابط جديد...');
-            await createBlob();
-            // ارفع البيانات المحلية الحالية
-            await pushToServer();
-        } else {
-            // فشل الاتصال → استخدم المحلي فقط
-            setStatus('warn', 'يعمل بالوضع المحلي');
-            console.log('⚠️ وضع محلي — مجموعات:', groups.length, 'حجوزات:', bookings.length);
-        }
-
-        lastKnownBookingsCount = bookings.length;
-    }
-
-    // --- حفظ البيانات (محلي + محاولة سيرفر) ---
+    // حفظ البيانات على السيرفر
     async function saveData() {
-        // 1. حفظ محلي فوراً
-        try {
-            localStorage.setItem('bookingGroups', JSON.stringify(groups));
-            localStorage.setItem('bookingList', JSON.stringify(bookings));
-        } catch (e) {}
+        localStorage.setItem('bookingGroups', JSON.stringify(groups));
+        localStorage.setItem('bookingList', JSON.stringify(bookings));
 
-        // 2. محاولة رفع على السيرفر (بدون انتظار)
-        const pushed = await pushToServer();
-        if (pushed) {
-            setStatus('ok', 'تم الحفظ والمزامنة');
-        } else {
-            setStatus('warn', 'محفوظ محلياً فقط');
+        if (!JSONBLOB_ID) {
+            try {
+                const res = await fetch('https://jsonblob.com/api/jsonBlob', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ groups, bookings })
+                });
+                if (res.ok) {
+                    const loc = res.headers.get('Location') || res.headers.get('location') || '';
+                    const id = loc.split('/').pop();
+                    if (id) {
+                        JSONBLOB_ID = id;
+                        localStorage.setItem('bookingBlobId', id);
+                        showSetupResult(id);
+                    }
+                }
+            } catch (e) {
+                console.error('إنشاء Blob فشل', e);
+            }
+        }
+        if (!JSONBLOB_ID) return;
+
+        try {
+            await fetch(getBlobUrl(), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ groups, bookings })
+            });
+        } catch (err) {
+            console.error('تعذر حفظ البيانات:', err);
+            alert('تم الحفظ على هذا الجهاز. فشل الإرسال للسحابة — تحقق من الإنترنت.');
         }
     }
 
-    // --- تحديث دوري ---
     async function refreshFromServer() {
-        console.log('=== تحديث دوري ===');
         await loadData();
         renderGroups();
         renderBookings();
-        if (document.getElementById('adminModal').classList.contains('active')) renderAdminBookings();
-        if (document.getElementById('groupsModal').classList.contains('active')) renderGroupsWindow();
-
-        // إشعار بالجديد
-        if (bookings.length > lastKnownBookingsCount) {
-            const newOnes = bookings.slice(lastKnownBookingsCount);
-            newOnes.forEach(b => {
-                showToast('🎉 تسجيل جديد', 'الطالب <strong>' + b.studentName + '</strong> سجل في "' + b.group + '"');
-            });
-            lastKnownBookingsCount = bookings.length;
-        }
+        if (adminModal.classList.contains('active')) renderAdminBookings();
+        if (groupsModal.classList.contains('active')) renderGroupsWindow();
     }
 
     function startSync() {
         refreshFromServer();
         setInterval(refreshFromServer, POLL_INTERVAL_MS);
     }
-    // ============================================================
-    // ============ DONNÉES ============
-    // ============================================================
-    let groups = [];
-    let bookings = [];
-    const DEFAULT_CAPACITY = 30;
 
-    // ============================================================
-    // ============ FONCTIONS MÉTIER ============
-    // ============================================================
+    // --------------------- دوال مساعدة ---------------------
     function getGroupCount(groupName) {
         return bookings.filter(b => b.group === groupName).length;
     }
 
     function isGroupFull(groupObj) {
+        if (groupObj.locked) return true; // القفل اليدوي يمنع التسجيل
         return getGroupCount(groupObj.name) >= groupObj.capacity;
     }
 
-    function isGroupClosed(groupObj) {
-        return !!(groupObj && groupObj.closed);
-    }
-
-    // ============================================================
-    // ============ SUPPRESSION D'UN ÉTUDIANT ============
-    // ============================================================
-    async function deleteStudent(studentName, group) {
-        if (!isAdmin) {
-            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
-            return;
-        }
-        if (!confirm('❓ هل أنت متأكد من حذف الطالب "' + studentName + '" من مجموعة "' + group + '"؟')) return;
-
-        const idx = bookings.findIndex(b => b.studentName === studentName && b.group === group);
-        if (idx === -1) {
-            alert('⚠️ لم يتم العثور على هذا الطالب');
-            return;
-        }
-
-        bookings.splice(idx, 1);
-        await saveData();
-        refreshFromServer();
-        alert('✅ تم حذف الطالب "' + studentName + '" بنجاح');
-    }
-
-    // ============================================================
-    // ============ تفريغ البرنامج بالكامل ============
-    // ============================================================
-    async function clearAllData() {
-        if (!isAdmin) {
-            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
-            return;
-        }
-        if (!confirm('🔴 تحذير!! أنت على وشك حذف جميع الحجوزات والمجموعات نهائياً.\nهل أنت متأكد تماماً؟')) return;
-
-        const response = prompt('🔴 تأكيد نهائي: اكتب "نعم" للتأكيد:');
-        if (response !== 'نعم') {
-            alert('❌ تم إلغاء العملية');
-            return;
-        }
-
-        bookings = [];
-        groups = [];
-        await saveData();
-        refreshFromServer();
-        alert('✅ تم تفريغ البرنامج بالكامل');
-        if (document.getElementById('adminModal').classList.contains('active')) {
-            renderAdminBookings();
-        }
-    }
-
-    // ============================================================
-    // ============ تصدير واستيراد البيانات ============
-    // ============================================================
-    function exportDataToFile() {
-        const data = {
-            groups: groups,
-            bookings: bookings,
-            exportedAt: new Date().toISOString(),
-            version: '1.0'
-        };
-
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'بيانات_الحجوزات_' + new Date().toISOString().slice(0,10) + '.json';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-        alert('✅ تم تصدير البيانات بنجاح!');
-    }
-
-    function openImportModal() {
-        if (!isAdmin) {
-            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
-            return;
-        }
-        document.getElementById('importModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        document.getElementById('importStatus').textContent = '';
-        document.getElementById('fileInput').value = '';
-    }
-
-    function closeImportModal() {
-        document.getElementById('importModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function importDataFromFile() {
-        if (!isAdmin) {
-            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
-            return;
-        }
-
-        const fileInput = document.getElementById('fileInput');
-        const status = document.getElementById('importStatus');
-
-        if (!fileInput.files || fileInput.files.length === 0) {
-            status.textContent = '⚠️ الرجاء اختيار ملف أولاً';
-            status.style.color = '#b0003a';
-            return;
-        }
-
-        const file = fileInput.files[0];
-        if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-            status.textContent = '⚠️ الرجاء اختيار ملف JSON صالح';
-            status.style.color = '#b0003a';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-
-                if (!data.groups || !Array.isArray(data.groups)) {
-                    throw new Error('الملف لا يحتوي على مجموعة صالحة');
-                }
-                if (!data.bookings || !Array.isArray(data.bookings)) {
-                    throw new Error('الملف لا يحتوي على حجوزات صالحة');
-                }
-
-                status.textContent = '⏳ جاري استيراد البيانات...';
-                status.style.color = '#5f2d8a';
-
-                groups = data.groups;
-                bookings = data.bookings;
-
-                await saveData();
-                refreshFromServer();
-
-                status.textContent = '✅ تم استيراد ' + bookings.length + ' حجز و ' + groups.length + ' مجموعة بنجاح!';
-                status.style.color = '#06D6A0';
-
-                setTimeout(() => {
-                    closeImportModal();
-                }, 2000);
-
-            } catch (err) {
-                status.textContent = '❌ خطأ: ' + err.message;
-                status.style.color = '#b0003a';
-                console.error('خطأ في الاستيراد:', err);
-            }
-        };
-
-        reader.onerror = function() {
-            status.textContent = '❌ حدث خطأ أثناء قراءة الملف';
-            status.style.color = '#b0003a';
-        };
-
-        reader.readAsText(file);
-    }
-
-    // ============================================================
-    // ============ التحقق من صلاحية المدير ============
-    // ============================================================
-    function requireAdmin(actionName) {
-        if (!isAdmin) {
-            alert('⚠️ هذه الخاصية (' + actionName + ') للمشرف فقط!\nيرجى الضغط على "🔐 دخول المدير" وإدخال كلمة المرور.');
-            return false;
-        }
-        return true;
-    }
-
-    // ============================================================
-    // ============ RENDU ============
-    // ============================================================
+    // --------------------- عناصر الصفحة ---------------------
     const groupSelect = document.getElementById('groupSelect');
     const groupTagsContainer = document.getElementById('groupTagsContainer');
     const newGroupInput = document.getElementById('newGroupInput');
+    const newGroupCapacityInput = document.getElementById('newGroupCapacityInput');
     const addGroupBtn = document.getElementById('addGroupBtn');
     const bookingsList = document.getElementById('bookingsList');
     const confirmationBox = document.getElementById('confirmationBox');
     const bookingForm = document.getElementById('bookingForm');
-    const adminModeBadge = document.getElementById('adminModeBadge');
 
+    // عناصر لوحة التحكم
     const adminPanelBtn = document.getElementById('adminPanelBtn');
     const adminModal = document.getElementById('adminModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -1492,199 +908,199 @@
     const totalCount = document.getElementById('totalCount');
     const groupCount = document.getElementById('groupCount');
     const exportBtn = document.getElementById('exportBtn');
-    const clearAllBtn = document.getElementById('clearAllBtn');
-    const newGroupCapacityInput = document.getElementById('newGroupCapacityInput');
+    const setupDbBtn = document.getElementById('setupDbBtn');
+    const setupResultBox = document.getElementById('setupResultBox');
+    const setupResultInput = document.getElementById('setupResultInput');
+    const setupCopyBtn = document.getElementById('setupCopyBtn');
 
+    // عناصر نافذة المجموعات والمقاعد
     const groupsWindowBtn = document.getElementById('groupsWindowBtn');
     const groupsModal = document.getElementById('groupsModal');
     const groupsModalCloseBtn = document.getElementById('groupsModalCloseBtn');
     const groupsWindowList = document.getElementById('groupsWindowList');
 
-    const exportDataBtn = document.getElementById('exportDataBtn');
-    const importDataBtn = document.getElementById('importDataBtn');
-    const importModal = document.getElementById('importModal');
-    const importModalCloseBtn = document.getElementById('importModalCloseBtn');
-    const importModalCloseBtn2 = document.getElementById('importModalCloseBtn2');
-    const importFileBtn = document.getElementById('importFileBtn');
-
-    function updateAdminUI() {
-        if (isAdmin) {
-            adminModeBadge.innerHTML = '<span class="admin-mode-badge">🔓 وضع المدير</span>';
-            adminPanelBtn.textContent = '🔓 تسجيل خروج المدير';
-            adminPanelBtn.style.background = 'linear-gradient(135deg, #EF476F, #b0003a)';
-        } else {
-            adminModeBadge.innerHTML = '';
-            adminPanelBtn.textContent = '🔐 دخول المدير';
-            adminPanelBtn.style.background = 'linear-gradient(135deg, #2d1b3d, #5f2d8a)';
-        }
-
-        const addGroupForm = document.getElementById('addGroupForm');
-        addGroupForm.style.display = isAdmin ? 'flex' : 'none';
-
-        renderGroups();
-        if (document.getElementById('groupsModal').classList.contains('active')) renderGroupsWindow();
+    function showSetupResult(id) {
+        setupResultBox.style.display = 'block';
+        setupResultInput.value = id;
     }
 
+    // --------------------- عرض المجموعات ---------------------
     function renderGroups() {
+        // تحديث القائمة المنسدلة
         groupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
-
-        if (groups.length === 0) {
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = '⚠️ لا توجد مجموعات مسجلة';
-            opt.disabled = true;
-            opt.selected = true;
-            groupSelect.appendChild(opt);
-
-            let msg = '📭 لا توجد مجموعات مسجلة. ';
-            if (isAdmin) {
-                msg += 'أضف مجموعة جديدة باستخدام النموذج أدناه.';
-            } else {
-                msg += 'يرجى الاتصال بالمدير لإضافة مجموعات.';
-            }
-            groupTagsContainer.innerHTML = '<div class="empty-groups-msg">' + msg + '</div>';
-            return;
-        }
-
         groups.forEach(g => {
             const count = getGroupCount(g.name);
             const full = isGroupFull(g);
-            const closed = isGroupClosed(g);
             const opt = document.createElement('option');
             opt.value = g.name;
-            if (closed) {
-                opt.textContent = g.name + ' (مغلقة 🔒)';
-            } else if (full) {
-                opt.textContent = g.name + ' (مكتملة 🔒)';
-            } else {
-                opt.textContent = g.name + ' (' + count + '/' + g.capacity + ')';
-            }
-            if (closed || full) opt.disabled = true;
+            let status = '';
+            if (g.locked) status = '🔒 (مقفولة يدوياً)';
+            else if (full) status = '🔒 (مكتملة)';
+            else status = `(${count}/${g.capacity})`;
+            opt.textContent = `${g.name} ${status}`;
+            if (full) opt.disabled = true;
             groupSelect.appendChild(opt);
         });
 
+        // تحديث علامات المجموعات
         groupTagsContainer.innerHTML = '';
         groups.forEach((g, idx) => {
             const count = getGroupCount(g.name);
             const full = isGroupFull(g);
-            const closed = isGroupClosed(g);
-            const statusLabel = closed ? ' مغلقة يدوياً' : (full ? ' مكتملة' : '');
-            const statusColor = closed ? '#a06d00' : (full ? '#b0003a' : '#5f2d8a');
-
             const tag = document.createElement('span');
-            tag.className = 'group-tag' + (closed ? ' closed' : '');
-
-            let html = g.name + ' <span style="font-size:0.8rem;color:' + statusColor + ';">(' + count + '/' + g.capacity + statusLabel + ')</span>';
-
-            if (isAdmin) {
-                html += ' <button class="lock-group" data-name="' + g.name + '" title="' + (closed ? 'فتح المجموعة' : 'غلق المجموعة') + '">' + (closed ? '🔓' : '🔒') + '</button>';
-                html += ' <button class="del-group" data-index="' + idx + '" title="حذف المجموعة">✕</button>';
-            } else {
-                if (closed) {
-                    html += ' <span style="font-size:0.8rem;color:#a06d00;">🔒</span>';
-                }
-            }
-
-            tag.innerHTML = html;
+            tag.className = `group-tag${g.locked ? ' locked' : ''}`;
+            tag.innerHTML = `
+                ${g.name}
+                <span style="font-size:0.8rem;color:${full ? '#b0003a' : '#5f2d8a'};">(${count}/${g.capacity}${g.locked ? ' 🔒مقفولة' : ''}${!g.locked && full ? ' مكتملة' : ''})</span>
+                <button class="lock-toggle" data-index="${idx}" title="${g.locked ? 'فتح القفل' : 'قفل المجموعة'}">${g.locked ? '🔒' : '🔓'}</button>
+                <button class="del-group" data-index="${idx}">✕</button>
+            `;
             groupTagsContainer.appendChild(tag);
         });
 
-        document.querySelectorAll('.lock-group').forEach(btn => {
-            btn.addEventListener('click', function() {
-                toggleGroupLock(this.dataset.name);
-            });
-        });
-
+        // أحداث الأزرار
         document.querySelectorAll('.del-group').forEach(btn => {
             btn.addEventListener('click', async function(e) {
-                if (!isAdmin) {
-                    alert('⚠️ هذه الخاصية للمشرف فقط!');
-                    return;
-                }
                 const groupName = groups[parseInt(this.dataset.index)]?.name;
-                if (!confirm('❓ هل أنت متأكد من حذف مجموعة "' + groupName + '"؟')) return;
-
                 await loadData();
                 const idx = groups.findIndex(g => g.name === groupName);
                 if (idx !== -1) groups.splice(idx, 1);
                 await saveData();
                 renderGroups();
                 renderBookings();
-                if (document.getElementById('groupsModal').classList.contains('active')) renderGroupsWindow();
+            });
+        });
+
+        document.querySelectorAll('.lock-toggle').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                const idx = parseInt(this.dataset.index);
+                const group = groups[idx];
+                if (!group) return;
+                // طلب كلمة المرور لتأكيد القفل/الفتح
+                const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد العملية:');
+                if (password === 'admin123') {
+                    group.locked = !group.locked;
+                    await saveData();
+                    renderGroups();
+                    renderBookings();
+                    if (groupsModal.classList.contains('active')) renderGroupsWindow();
+                } else if (password !== null) {
+                    alert('❌ كلمة المرور غير صحيحة!');
+                }
             });
         });
     }
 
+    // --------------------- عرض الحجوزات مع أزرار التعديل والحذف ---------------------
     function renderBookings() {
         if (bookings.length === 0) {
-            bookingsList.innerHTML = '<div class="no-bookings">لا توجد حجوزات حتى الآن</div>';
+            bookingsList.innerHTML = `<div class="no-bookings">لا توجد حجوزات حتى الآن</div>`;
             return;
         }
         let html = '';
         const reversed = [...bookings].reverse();
-        reversed.forEach(b => {
-            const adminActions = isAdmin 
-                ? '<div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">' +
-                    '<button class="copy-link-btn" style="background:#e1f7f0; color:#0a4b3a;" onclick="openEditModal(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)">✏️ تعديل</button>' +
-                    '<button class="copy-link-btn" style="background:#ffd8d8; color:#b0003a;" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)">🗑️ حذف</button>' +
-                  '</div>'
-                : '';
-            html += '<div class="booking-card">' +
-                '<div class="student-name">👤 ' + b.studentName + '</div>' +
-                '<div class="details">' +
-                    '<span>📘 ' + b.stage + '</span>' +
-                    '<span>📚 ' + b.group + '</span>' +
-                    '<span>📞 ' + b.studentPhone + '</span>' +
-                    '<span>📞 ولي: ' + b.parentPhone + '</span>' +
-                '</div>' +
-                '<div class="timestamp">🕒 ' + (b.timestamp || 'وقت غير محدد') + '</div>' +
-                adminActions +
-            '</div>';
+        reversed.forEach((b, idx) => {
+            const realIndex = bookings.length - 1 - idx;
+            html += `
+                <div class="booking-card" data-index="${realIndex}">
+                    <div class="student-name">👤 ${b.studentName}</div>
+                    <div class="details">
+                        <span>📘 ${b.stage}</span>
+                        <span>📚 ${b.group}</span>
+                        <span>📞 ${b.studentPhone}</span>
+                        <span>📞 ولي: ${b.parentPhone}</span>
+                    </div>
+                    <div class="timestamp">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
+                    <div class="actions">
+                        <button class="edit-btn" data-index="${realIndex}">✏️ تعديل</button>
+                        <button class="delete-btn" data-index="${realIndex}">🗑️ حذف</button>
+                    </div>
+                </div>
+            `;
         });
         bookingsList.innerHTML = html;
+
+        // أحداث أزرار التعديل والحذف
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                const idx = parseInt(this.dataset.index);
+                const booking = bookings[idx];
+                if (!booking) return;
+                // طلب كلمة المرور
+                const password = prompt('🔐 أدخل كلمة مرور المدير لتعديل بيانات الطالب:');
+                if (password !== 'admin123') {
+                    if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
+                    return;
+                }
+                // فتح نافذة تعديل بسيطة
+                const newName = prompt('✏️ تعديل اسم الطالب:', booking.studentName);
+                if (newName !== null && newName.trim()) booking.studentName = newName.trim();
+                const newPhone = prompt('📞 تعديل تليفون الطالب:', booking.studentPhone);
+                if (newPhone !== null && newPhone.trim()) booking.studentPhone = newPhone.trim();
+                const newParentPhone = prompt('📞 تعديل تليفون ولي الأمر:', booking.parentPhone);
+                if (newParentPhone !== null && newParentPhone.trim()) booking.parentPhone = newParentPhone.trim();
+                booking.timestamp = new Date().toLocaleString('ar-EG', { hour12: true }) + ' (تم التعديل)';
+                await saveData();
+                renderBookings();
+                if (adminModal.classList.contains('active')) renderAdminBookings();
+                if (groupsModal.classList.contains('active')) renderGroupsWindow();
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                const idx = parseInt(this.dataset.index);
+                const booking = bookings[idx];
+                if (!booking) return;
+                const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد حذف الحجز:');
+                if (password !== 'admin123') {
+                    if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
+                    return;
+                }
+                if (confirm(`هل أنت متأكد من حذف حجز الطالب "${booking.studentName}"؟`)) {
+                    bookings.splice(idx, 1);
+                    await saveData();
+                    renderBookings();
+                    if (adminModal.classList.contains('active')) renderAdminBookings();
+                    if (groupsModal.classList.contains('active')) renderGroupsWindow();
+                }
+            });
+        });
     }
 
+    // --------------------- عرض الحجوزات في لوحة التحكم ---------------------
     function renderAdminBookings() {
         totalCount.textContent = bookings.length;
         groupCount.textContent = groups.length;
 
         if (bookings.length === 0) {
-            modalBookingsList.innerHTML = '<div class="modal-empty">📭 لا توجد حجوزات مسجلة حتى الآن</div>';
+            modalBookingsList.innerHTML = `<div class="modal-empty">📭 لا توجد حجوزات مسجلة حتى الآن</div>`;
             return;
         }
 
         let html = '';
         const reversed = [...bookings].reverse();
         reversed.forEach((b, index) => {
-            html += '<div class="modal-booking-card">' +
-                '<div class="m-info">' +
-                    '<div class="m-name">#' + (index + 1) + ' 👤 ' + b.studentName + '</div>' +
-                    '<div class="m-details">' +
-                        '<span>📘 ' + b.stage + '</span>' +
-                        '<span>📚 ' + b.group + '</span>' +
-                        '<span>📞 ' + b.studentPhone + '</span>' +
-                        '<span>📞 ولي: ' + b.parentPhone + '</span>' +
-                    '</div>' +
-                    '<div class="m-time">🕒 ' + (b.timestamp || 'وقت غير محدد') + '</div>' +
-                '</div>' +
-                '<div class="m-actions">' +
-                    '<button class="del-student-btn" onclick="openEditModal(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="تعديل" style="background:#e1f7f0; color:#0a4b3a;">✎</button>' +
-                    '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' +
-                '</div>' +
-            '</div>';
+            html += `
+                <div class="modal-booking-card">
+                    <div class="m-name">#${index + 1} 👤 ${b.studentName}</div>
+                    <div class="m-details">
+                        <span>📘 ${b.stage}</span>
+                        <span>📚 ${b.group}</span>
+                        <span>📞 ${b.studentPhone}</span>
+                        <span>📞 ولي: ${b.parentPhone}</span>
+                    </div>
+                    <div class="m-time">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
+                </div>
+            `;
         });
         modalBookingsList.innerHTML = html;
     }
 
+    // --------------------- عرض نافذة المجموعات والمقاعد ---------------------
     function renderGroupsWindow() {
         if (groups.length === 0) {
-            let msg = '📭 لا توجد مجموعات مسجلة. ';
-            if (isAdmin) {
-                msg += 'أضف مجموعة جديدة في قسم "إدارة المجموعات".';
-            } else {
-                msg += 'يرجى الاتصال بالمدير لإضافة مجموعات.';
-            }
-            groupsWindowList.innerHTML = '<div class="gw-empty">' + msg + '</div>';
+            groupsWindowList.innerHTML = `<div class="gw-empty">لا توجد مجموعات مضافة حتى الآن</div>`;
             return;
         }
 
@@ -1692,75 +1108,39 @@
         groups.forEach(g => {
             const studentsInGroup = bookings.filter(b => b.group === g.name);
             const count = studentsInGroup.length;
-            const full = count >= g.capacity;
-            const closed = isGroupClosed(g);
+            const full = isGroupFull(g);
             const percent = Math.min((count / g.capacity) * 100, 100);
 
             let studentsHtml = '';
             if (studentsInGroup.length === 0) {
-                studentsHtml = '<div class="gw-empty">لا يوجد طلاب مسجلين في هذه المجموعة بعد</div>';
+                studentsHtml = `<div class="gw-empty">لا يوجد طلاب مسجلين في هذه المجموعة بعد</div>`;
             } else {
                 studentsInGroup.forEach((b, i) => {
-                    studentsHtml += '<div class="gw-student">' +
-                        '<span>' + (i + 1) + '. 👤 ' + b.studentName + ' — 📘 ' + b.stage + '</span>' +
-                        (isAdmin 
-                            ? '<span style="display:flex; gap:4px;">' +
-                                '<button class="del-student-btn" onclick="openEditModal(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="تعديل" style="background:#e1f7f0; color:#0a4b3a; width:24px; height:24px; font-size:0.8rem;">✎</button>' +
-                                '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' +
-                              '</span>'
-                            : '') +
-                    '</div>';
+                    studentsHtml += `<div class="gw-student">${i + 1}. 👤 ${b.studentName} — 📘 ${b.stage}</div>`;
                 });
             }
 
-            html += '<div class="group-window-card ' + (closed ? 'closed' : (full ? 'full' : '')) + '">' +
-                '<div class="gw-header">' +
-                    '<span class="gw-name">📁 ' + g.name + '</span>' +
-                    '<span class="gw-count">' + count + ' / ' + g.capacity + ' ' + (closed ? '🔒 مغلقة يدوياً' : (full ? '🔒 مكتملة' : '')) + '</span>' +
-                    (isAdmin ? '<button class="gw-lock-btn" onclick="toggleGroupLock(&quot;' + g.name + '&quot;)">' + (closed ? '🔓 فتح المجموعة' : '🔒 غلق المجموعة') + '</button>' : '') +
-                '</div>' +
-                '<div class="gw-progress"><div class="gw-progress-bar" style="width:' + percent + '%"></div></div>' +
-                '<div class="gw-students">' + studentsHtml + '</div>' +
-            '</div>';
+            let statusClass = '';
+            let statusText = '';
+            if (g.locked) { statusClass = 'locked-manual'; statusText = '🔒 مقفولة يدوياً'; }
+            else if (full) { statusClass = 'full'; statusText = '🔒 مكتملة'; }
+            else { statusText = `متاحة (${g.capacity - count} مقعد)`; }
+
+            html += `
+                <div class="group-window-card ${statusClass}">
+                    <div class="gw-header">
+                        <span class="gw-name">📁 ${g.name}</span>
+                        <span class="gw-count">${count} / ${g.capacity} ${statusText}</span>
+                    </div>
+                    <div class="gw-progress"><div class="gw-progress-bar" style="width:${percent}%"></div></div>
+                    <div class="gw-students">${studentsHtml}</div>
+                </div>
+            `;
         });
         groupsWindowList.innerHTML = html;
     }
 
-    function showConfirmation(bookingData) {
-        confirmationBox.classList.add('active');
-        const waNumber = '01227234406';
-        const msg = 'مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ' + bookingData.studentName + '\nالمرحلة: ' + bookingData.stage + '\nالمجموعة: ' + bookingData.group + '\nتليفون الطالب: ' + bookingData.studentPhone + '\nتليفون ولي الأمر: ' + bookingData.parentPhone;
-        const waLink = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(msg);
-        document.getElementById('whatsappShareBtn').href = waLink;
-
-        document.getElementById('copyLinkBtn').onclick = function() {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url).then(() => {
-                alert('تم نسخ رابط الحجز! يمكنك مشاركته مع الطلاب.');
-            }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = url;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                alert('تم نسخ الرابط!');
-            });
-        };
-    }
-
-    function showToast(title, message) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = '<span class="toast-title">' + title + '</span>' + message;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 6000);
-    }
-
-    // ============================================================
-    // ============ GESTIONNAIRE DE RÉSERVATION ============
-    // ============================================================
+    // --------------------- تسجيل حجز جديد ---------------------
     async function handleBooking(e) {
         e.preventDefault();
 
@@ -1775,11 +1155,6 @@
             return;
         }
 
-        if (groups.length === 0) {
-            alert('⚠️ لا توجد مجموعات مسجلة. الرجاء الاتصال بالمدير لإضافة مجموعة.');
-            return;
-        }
-
         const submitBtn = bookingForm.querySelector('.btn-primary');
         submitBtn.disabled = true;
         submitBtn.textContent = 'جارٍ التسجيل...';
@@ -1788,14 +1163,8 @@
         renderGroups();
 
         const groupObj = groups.find(g => g.name === group);
-        if (groupObj && isGroupClosed(groupObj)) {
-            alert('🔒 عذراً، مجموعة "' + group + '" مغلقة حالياً ولا يمكن التسجيل فيها.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'تسجيل الحجز';
-            return;
-        }
         if (groupObj && isGroupFull(groupObj)) {
-            alert('⚠️ عذراً، مجموعة "' + group + '" اكتمل عدد المقاعد بها (' + groupObj.capacity + ' طالب) ولا يمكن التسجيل فيها بعد الآن.');
+            alert(`⚠️ عذراً، مجموعة "${group}" غير متاحة للتسجيل (مقفولة أو مكتملة).`);
             submitBtn.disabled = false;
             submitBtn.textContent = 'تسجيل الحجز';
             return;
@@ -1820,10 +1189,18 @@
         };
 
         bookings.push(newBooking);
-        if (knownBookingKeys) knownBookingKeys.add(bookingKey(newBooking));
         await saveData();
         renderBookings();
-        showConfirmation(newBooking);
+
+        // إظهار شاشة التأكيد
+        confirmationBox.classList.add('active');
+        const waNumber = '01227234406';
+        const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${studentName}\nالمرحلة: ${stage}\nالمجموعة: ${group}\nتليفون الطالب: ${studentPhone}\nتليفون ولي الأمر: ${parentPhone}`;
+        document.getElementById('whatsappShareBtn').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+        document.getElementById('copyLinkBtn').onclick = function() {
+            navigator.clipboard.writeText(window.location.href).then(() => alert('تم نسخ الرابط!'))
+                .catch(() => { const ta = document.createElement('textarea'); ta.value = window.location.href; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('تم نسخ الرابط!'); });
+        };
 
         document.getElementById('stage').value = '';
         document.getElementById('studentName').value = '';
@@ -1835,37 +1212,8 @@
         submitBtn.textContent = 'تسجيل الحجز';
     }
 
-    // ============================================================
-    // ============ غلق / فتح المجموعة يدوياً ============
-    // ============================================================
-    async function toggleGroupLock(groupName) {
-        if (!isAdmin) {
-            alert('⚠️ غلق أو فتح المجموعة خاصية للمشرف فقط!\nيرجى الضغط على "🔐 دخول المدير" وإدخال كلمة المرور.');
-            return;
-        }
-        await loadData();
-        const g = groups.find(x => x.name === groupName);
-        if (!g) { alert('⚠️ لم يتم العثور على هذه المجموعة'); return; }
-
-        g.closed = !g.closed;
-        await saveData();
-        renderGroups();
-        renderGroupsWindow();
-        alert(g.closed
-            ? '🔒 تم غلق مجموعة "' + groupName + '". لن يستطيع أي طالب جديد التسجيل فيها حتى تفتحها مرة أخرى.'
-            : '🔓 تم فتح مجموعة "' + groupName + '" مرة أخرى للتسجيل.');
-    }
-    window.toggleGroupLock = toggleGroupLock;
-
-    // ============================================================
-    // ============ AJOUT DE GROUPE ============
-    // ============================================================
+    // --------------------- إضافة مجموعة ---------------------
     async function addGroup() {
-        if (!isAdmin) {
-            alert('⚠️ إضافة مجموعات خاصية للمشرف فقط!\nيرجى الضغط على "🔐 دخول المدير" وإدخال كلمة المرور.');
-            return;
-        }
-
         const val = newGroupInput.value.trim();
         if (!val) { alert('أدخل اسم المجموعة'); return; }
 
@@ -1875,33 +1223,20 @@
         await loadData();
         if (groups.some(g => g.name === val)) { alert('المجموعة موجودة بالفعل'); renderGroups(); return; }
 
-        groups.push({ name: val, capacity: capacity, closed: false });
+        groups.push({ name: val, capacity: capacity, locked: false });
         await saveData();
         renderGroups();
         newGroupInput.value = '';
         newGroupCapacityInput.value = DEFAULT_CAPACITY;
-        alert('✅ تم إضافة مجموعة "' + val + '" بنجاح');
     }
 
-    // ============================================================
-    // ============ MODALES ============
-    // ============================================================
-    function toggleAdminMode() {
-        if (isAdmin) {
-            isAdmin = false;
-            updateAdminUI();
-            alert('🔓 تم تسجيل خروج المدير');
-            return;
-        }
-
+    // --------------------- دوال النوافذ المنبثقة ---------------------
+    function openAdminPanel() {
         const password = prompt('🔐 أدخل كلمة المرور للمشرف:');
         if (password === 'admin123') {
-            isAdmin = true;
-            updateAdminUI();
             renderAdminBookings();
             adminModal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            alert('✅ تم الدخول كمدير بنجاح');
         } else if (password !== null) {
             alert('❌ كلمة المرور غير صحيحة!');
         }
@@ -1923,300 +1258,61 @@
         document.body.style.overflow = '';
     }
 
-    // ============================================================
-    // ============ EXPORT ============
-    // ============================================================
+    // --------------------- تصدير البيانات ---------------------
     function exportData() {
         if (bookings.length === 0) {
             alert('لا توجد بيانات للتصدير!');
             return;
         }
-
-        let csv = '\uFEFF';
-        csv += 'م,الاسم,المرحلة,المجموعة,تليفون الطالب,تليفون ولي الأمر,وقت التسجيل\n';
+        let csv = '\uFEFFم,الاسم,المرحلة,المجموعة,تليفون الطالب,تليفون ولي الأمر,وقت التسجيل\n';
         bookings.forEach((b, i) => {
-            const row = [
-                i + 1,
-                b.studentName || '',
-                b.stage || '',
-                b.group || '',
-                b.studentPhone || '',
-                b.parentPhone || '',
-                b.timestamp || ''
-            ].map(cell => {
-                const s = String(cell).replace(/"/g, '""');
-                return '"' + s + '"';
-            });
-            csv += row.join(',') + '\n';
+            csv += [i + 1, b.studentName, b.stage, b.group, b.studentPhone, b.parentPhone, b.timestamp]
+                .map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',') + '\n';
         });
-
-        const csvBlob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const csvUrl = URL.createObjectURL(csvBlob);
-        const a1 = document.createElement('a');
-        a1.href = csvUrl;
-        a1.download = 'حجوزات_' + new Date().toISOString().slice(0, 10) + '.csv';
-        a1.style.display = 'none';
-        document.body.appendChild(a1);
-        a1.click();
-        document.body.removeChild(a1);
-        setTimeout(() => URL.revokeObjectURL(csvUrl), 2000);
-
-        let text = 'تقرير الحجوزات - مستر علاء الحفني\n';
-        text += '='.repeat(40) + '\n';
-        text += 'إجمالي الحجوزات: ' + bookings.length + '\n';
-        text += 'عدد المجموعات: ' + groups.length + '\n';
-        text += '='.repeat(40) + '\n\n';
-        bookings.forEach((b, i) => {
-            text += '#' + (i + 1) + '\n';
-            text += '  الاسم: ' + b.studentName + '\n';
-            text += '  المرحلة: ' + b.stage + '\n';
-            text += '  المجموعة: ' + b.group + '\n';
-            text += '  تليفون الطالب: ' + b.studentPhone + '\n';
-            text += '  تليفون ولي الأمر: ' + b.parentPhone + '\n';
-            text += '  وقت التسجيل: ' + (b.timestamp || '') + '\n';
-            text += '-'.repeat(30) + '\n';
-        });
-
-        const txtBlob = new Blob(['\uFEFF' + text], { type: 'text/plain;charset=utf-8;' });
-        const txtUrl = URL.createObjectURL(txtBlob);
-        const a2 = document.createElement('a');
-        a2.href = txtUrl;
-        a2.download = 'تقرير_حجوزات_' + new Date().toISOString().slice(0, 10) + '.txt';
-        a2.style.display = 'none';
-        document.body.appendChild(a2);
-        a2.click();
-        document.body.removeChild(a2);
-        setTimeout(() => URL.revokeObjectURL(txtUrl), 2000);
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).catch(function() {});
-        }
-
-        alert('✅ تم تنزيل ملفين:\n1) ملف Excel/CSV\n2) تقرير نصي');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'حجوزات_' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
     }
 
-    // ============================================================
-    // ============ INITIALISATION ============
-    // ============================================================
-    
-    // ============================================================
-    // ============ تعديل بيانات الطالب ============
-    // ============================================================
-    const editModal = document.getElementById('editModal');
-    const editForm = document.getElementById('editForm');
-    const editModalCloseBtn = document.getElementById('editModalCloseBtn');
-    const editGroupSelect = document.getElementById('editGroupSelect');
-
-    function openEditModal(studentName, group) {
-        if (!isAdmin) {
-            alert('⚠️ تعديل البيانات خاصية للمشرف فقط!');
-            return;
-        }
-
-        const b = bookings.find(x => x.studentName === studentName && x.group === group);
-        if (!b) {
-            alert('⚠️ لم يتم العثور على هذا الطالب');
-            return;
-        }
-
-        // Fill the form
-        document.getElementById('editOldName').value = studentName;
-        document.getElementById('editOldGroup').value = group;
-        document.getElementById('editStage').value = b.stage || 'ابتدائي';
-        document.getElementById('editStudentName').value = b.studentName || '';
-        document.getElementById('editStudentPhone').value = b.studentPhone || '';
-        document.getElementById('editParentPhone').value = b.parentPhone || '';
-
-        // Fill group select
-        editGroupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
-        groups.forEach(g => {
-            const opt = document.createElement('option');
-            opt.value = g.name;
-            opt.textContent = g.name + ' (' + getGroupCount(g.name) + '/' + g.capacity + ')';
-            if (g.name === b.group) opt.selected = true;
-            editGroupSelect.appendChild(opt);
-        });
-
-        editModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeEditModal() {
-        editModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    async function handleEdit(e) {
-        e.preventDefault();
-
-        const oldName = document.getElementById('editOldName').value;
-        const oldGroup = document.getElementById('editOldGroup').value;
-
-        const stage = document.getElementById('editStage').value;
-        const studentName = document.getElementById('editStudentName').value.trim();
-        const studentPhone = document.getElementById('editStudentPhone').value.trim();
-        const parentPhone = document.getElementById('editParentPhone').value.trim();
-        const group = editGroupSelect.value;
-
-        if (!stage || !studentName || !studentPhone || !parentPhone || !group) {
-            alert('الرجاء ملء جميع الحقول!');
-            return;
-        }
-
-        // Find and update the booking
-        const idx = bookings.findIndex(b => b.studentName === oldName && b.group === oldGroup);
-        if (idx === -1) {
-            alert('⚠️ لم يتم العثور على الحجز الأصلي');
-            return;
-        }
-
-        // Check if new group is full (and different from old)
-        if (group !== oldGroup) {
-            const groupObj = groups.find(g => g.name === group);
-            if (groupObj && isGroupClosed(groupObj)) {
-                alert('🔒 المجموعة الجديدة مغلقة');
-                return;
-            }
-            if (groupObj && isGroupFull(groupObj)) {
-                alert('⚠️ المجموعة الجديدة مكتملة');
-                return;
-            }
-        }
-
-        bookings[idx] = {
-            stage,
-            studentName,
-            studentPhone,
-            parentPhone,
-            group,
-            timestamp: bookings[idx].timestamp || new Date().toLocaleString('ar-EG', { hour12: true })
-        };
-
-        await saveData();
-        refreshFromServer();
-        closeEditModal();
-        alert('✅ تم تعديل البيانات بنجاح');
-    }
-
-    window.openEditModal = openEditModal;
-
-async function init() {
-        // تحميل البيانات أولاً ثم عرضها
-        await loadData();
+    // --------------------- التهيئة ---------------------
+    function init() {
         renderGroups();
         renderBookings();
-        updateAdminUI();
-
         bookingForm.addEventListener('submit', handleBooking);
         addGroupBtn.addEventListener('click', addGroup);
         newGroupInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addGroup(); } });
 
-        adminPanelBtn.addEventListener('click', toggleAdminMode);
+        adminPanelBtn.addEventListener('click', openAdminPanel);
         modalCloseBtn.addEventListener('click', closeAdminPanel);
-        adminModal.addEventListener('click', function(e) {
-            if (e.target === this) closeAdminPanel();
-        });
+        adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
         exportBtn.addEventListener('click', exportData);
-        clearAllBtn.addEventListener('click', clearAllData);
+        setupDbBtn.addEventListener('click', async function() {
+            if (JSONBLOB_ID) { showSetupResult(JSONBLOB_ID); return; }
+            await saveData();
+            if (!JSONBLOB_ID) alert('حصل خطأ أثناء إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
+        });
+        setupCopyBtn.addEventListener('click', function() {
+            setupResultInput.select();
+            navigator.clipboard.writeText(setupResultInput.value).then(() => alert('✅ تم نسخ الكود!'));
+        });
 
         groupsWindowBtn.addEventListener('click', openGroupsWindow);
         groupsModalCloseBtn.addEventListener('click', closeGroupsWindow);
-        groupsModal.addEventListener('click', function(e) {
-            if (e.target === this) closeGroupsWindow();
-        });
-
-        exportDataBtn.addEventListener('click', exportDataToFile);
-        importDataBtn.addEventListener('click', openImportModal);
-        importModalCloseBtn.addEventListener('click', closeImportModal);
-        importModalCloseBtn2.addEventListener('click', closeImportModal);
-        importModal.addEventListener('click', function(e) {
-            if (e.target === this) closeImportModal();
-        });
-        importFileBtn.addEventListener('click', importDataFromFile);
-        document.getElementById('manualSyncBtn').addEventListener('click', async function() {
-            setStatus('sync', 'جاري التحديث اليدوي...');
-            await refreshFromServer();
-            showToast('✅ تم التحديث', 'تم تحديث البيانات');
-        });
-
-        document.getElementById('fileInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                importDataFromFile();
-            }
-        });
+        groupsModal.addEventListener('click', function(e) { if (e.target === this) closeGroupsWindow(); });
 
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') { 
-                closeAdminPanel(); 
-                closeGroupsWindow();
-                closeImportModal();
-                closeEditModal();
-            }
+            if (e.key === 'Escape') { closeAdminPanel(); closeGroupsWindow(); }
         });
-
-        editModalCloseBtn.addEventListener('click', closeEditModal);
-        editModal.addEventListener('click', function(e) {
-            if (e.target === this) closeEditModal();
-        });
-        editForm.addEventListener('submit', handleEdit);
 
         startSync();
     }
 
-    window.deleteStudent = deleteStudent;
-    window.toggleGroupLock = toggleGroupLock;
-
     init();
 </script>
-
-
-<!-- نافذة تعديل بيانات الطالب -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-content">
-        <button class="modal-close" id="editModalCloseBtn">✕</button>
-        <h2>✏️ تعديل بيانات الطالب</h2>
-        <p class="subtitle">قم بتعديل البيانات المطلوبة ثم اضغط حفظ</p>
-
-        <form id="editForm" style="margin-top:15px;">
-            <input type="hidden" id="editOldName">
-            <input type="hidden" id="editOldGroup">
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="editStage">المرحلة الدراسية</label>
-                    <select id="editStage" required>
-                        <option value="ابتدائي">ابتدائي</option>
-                        <option value="إعدادي">إعدادي</option>
-                        <option value="ثانوي">ثانوي</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="editStudentName">اسم الطالب</label>
-                    <input type="text" id="editStudentName" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="editStudentPhone">تليفون الطالب</label>
-                    <input type="tel" id="editStudentPhone" required>
-                </div>
-                <div class="form-group">
-                    <label for="editParentPhone">تليفون ولي الأمر</label>
-                    <input type="tel" id="editParentPhone" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="editGroupSelect">المجموعة</label>
-                <select id="editGroupSelect" required></select>
-            </div>
-
-            <button type="submit" class="btn-primary" style="margin-top:10px;">💾 حفظ التعديلات</button>
-        </form>
-    </div>
-</div>
 
 </body>
 </html>
