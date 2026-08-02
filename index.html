@@ -1119,6 +1119,35 @@
         }
     }
 
+    // ============ إنشاء blob جديد ============
+    async function createNewBlob() {
+        try {
+            console.log('جاري إنشاء blob جديد...');
+            updateSyncStatus('syncing', 'جاري إنشاء رابط جديد...');
+            const res = await fetch('https://jsonblob.com/api/jsonBlob', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ groups: groups || [], bookings: bookings || [] })
+            });
+            if (res.ok) {
+                const loc = res.headers.get('Location') || res.headers.get('location') || '';
+                const id = loc.split('/').pop();
+                if (id) {
+                    JSONBLOB_ID = id;
+                    localStorage.setItem('bookingBlobId', id);
+                    console.log('✅ تم إنشاء blob جديد:', id);
+                    updateSyncStatus('success', 'تم إنشاء رابط جديد');
+                    return true;
+                }
+            }
+            throw new Error('فشل إنشاء blob: ' + res.status);
+        } catch (e) {
+            console.error('❌ إنشاء Blob فشل:', e);
+            updateSyncStatus('error', 'فشل إنشاء رابط جديد');
+            return false;
+        }
+    }
+
     // ============ تحميل البيانات (السيرفر أولاً) ============
     async function loadData() {
         updateSyncStatus('syncing');
@@ -1139,11 +1168,13 @@
         let serverOk = false;
 
         if (!JSONBLOB_ID) {
-            console.log('لا يوجد JSONBLOB_ID، سيتم الاعتماد على البيانات المحلية');
-            groups = localGroups;
-            bookings = localBookings;
-            updateSyncStatus('error', 'لا يوجد رابط سيرفر');
-            return false;
+            console.log('لا يوجد JSONBLOB_ID، سيتم محاولة إنشاء واحد جديد...');
+            const created = await createNewBlob();
+            if (!created) {
+                groups = localGroups;
+                bookings = localBookings;
+                return false;
+            }
         }
 
         try {
@@ -1153,18 +1184,35 @@
                 cache: 'no-store'
             });
 
-            if (!res.ok) {
+            if (res.status === 404) {
+                console.warn('⚠️ Blob غير موجود (404)، سيتم إنشاء blob جديد...');
+                const created = await createNewBlob();
+                if (created) {
+                    // بعد الإنشاء، نحاول القراءة مرة أخرى
+                    const res2 = await fetch(getBlobUrl(), {
+                        headers: { 'Accept': 'application/json' },
+                        cache: 'no-store'
+                    });
+                    if (res2.ok) {
+                        const data = await res2.json();
+                        if (Array.isArray(data.groups)) remoteGroups = data.groups;
+                        if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
+                        serverOk = true;
+                        updateSyncStatus('success', 'تم إنشاء رابط وتحميل البيانات');
+                    }
+                }
+            } else if (!res.ok) {
                 throw new Error('HTTP ' + res.status + ' ' + res.statusText);
+            } else {
+                const data = await res.json();
+                console.log('✅ تم الاتصال بالسيرفر بنجاح');
+
+                if (Array.isArray(data.groups)) remoteGroups = data.groups;
+                if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
+
+                serverOk = true;
+                updateSyncStatus('success', 'آخر تحديث: ' + new Date().toLocaleTimeString('ar-EG'));
             }
-
-            const data = await res.json();
-            console.log('تم الاتصال بالسيرفر بنجاح:', data);
-
-            if (Array.isArray(data.groups)) remoteGroups = data.groups;
-            if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
-
-            serverOk = true;
-            updateSyncStatus('success', 'آخر تحديث: ' + new Date().toLocaleTimeString('ar-EG'));
 
         } catch (err) {
             console.warn('⚠️ تعذر الاتصال بالسيرفر:', err.message);
@@ -1199,48 +1247,44 @@
         try {
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
-            console.log('تم الحفظ محلياً');
+            console.log('✅ تم الحفظ محلياً');
         } catch (e) {
             console.warn('خطأ في حفظ localStorage:', e);
         }
 
-        // 2. إنشاء blob جديد إن لم يكن موجوداً
+        // 2. إنشاء blob جديد إن لم يكن موجوداً أو إذا كان 404
         if (!JSONBLOB_ID) {
-            try {
-                console.log('جاري إنشاء blob جديد...');
-                const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ groups, bookings })
-                });
-                if (res.ok) {
-                    const loc = res.headers.get('Location') || res.headers.get('location') || '';
-                    const id = loc.split('/').pop();
-                    if (id) {
-                        JSONBLOB_ID = id;
-                        localStorage.setItem('bookingBlobId', id);
-                        console.log('تم إنشاء blob جديد:', id);
-                        updateSyncStatus('success', 'تم إنشاء رابط جديد');
-                    }
-                }
-            } catch (e) {
-                console.error('إنشاء Blob فشل:', e);
-                updateSyncStatus('error', 'فشل إنشاء رابط');
-            }
+            const created = await createNewBlob();
+            if (!created) return;
         }
-        if (!JSONBLOB_ID) return;
 
         // 3. رفع على السيرفر
         try {
-            console.log('جاري الرفع على السيرفر...');
+            console.log('جاري الرفع على السيرفر:', getBlobUrl());
             const res = await fetch(getBlobUrl(), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ groups, bookings })
             });
             if (res.ok) {
-                console.log('تم الرفع على السيرفر بنجاح');
+                console.log('✅ تم الرفع على السيرفر بنجاح');
                 updateSyncStatus('success', 'تم الحفظ على السيرفر');
+            } else if (res.status === 404) {
+                console.warn('⚠️ Blob غير موجود أثناء الحفظ (404)، سيتم إنشاء blob جديد...');
+                const created = await createNewBlob();
+                if (created) {
+                    // حاول مرة أخرى
+                    const res2 = await fetch(getBlobUrl(), {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ groups, bookings })
+                    });
+                    if (res2.ok) {
+                        updateSyncStatus('success', 'تم الحفظ بعد إنشاء رابط جديد');
+                    } else {
+                        throw new Error('HTTP ' + res2.status);
+                    }
+                }
             } else {
                 throw new Error('HTTP ' + res.status);
             }
