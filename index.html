@@ -1032,123 +1032,182 @@
 </div>
 
 <div style="margin-top:10px; font-size:0.8rem; color:#9b8aa0; text-align:center; max-width:700px;">
-    ⚡ جميع البيانات محفوظة في قاعدة بيانات مشتركة على الإنترنت، وتتحدث تلقائياً كل بضع ثوانٍ عند أي شخص يفتح نفس الرابط من أي جهاز.
+    <div style="margin-top:15px; font-size:0.85rem; text-align:center; max-width:700px; background:#fffdf7; padding:10px 20px; border-radius:30px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+    <span id="syncStatus">⚪ في انتظار الاتصال...</span>
+    <button id="manualSyncBtn" style="background:#9B5DE5; color:white; border:none; padding:4px 14px; border-radius:20px; font-weight:700; font-size:0.75rem; cursor:pointer; margin-right:8px; font-family:'Cairo',sans-serif;">🔄 تحديث الآن</button>
+</div>
+
+⚡ جميع البيانات محفوظة في قاعدة بيانات مشتركة على الإنترنت، وتتحدث تلقائياً كل بضع ثوانٍ عند أي شخص يفتح نفس الرابط من أي جهاز.
 </div>
 
 <script>
     // ============================================================
-    // ============ تزامن تلقائي ثنائي الاتجاه ============
+    // ============ تزامن تلقائي ثنائي الاتجاه (مُحسّن) ============
     // ============================================================
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 5000;
     let isAdmin = false;
+    let lastSyncStatus = 'idle'; // idle | success | error
 
     function getBlobUrl() {
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
 
-    // ============ دمج ذكي للبيانات ============
+    // ============ مفتاح فريد للحجز (أكثر موثوقية) ============
     function bookingKey(b) {
-        return [b.studentName, b.group, b.timestamp].join('|');
+        // نستخدم الاسم + المجموعة + تليفون الطالب (أكثر استقراراً من الوقت)
+        return (b.studentName || '') + '|' + (b.group || '') + '|' + (b.studentPhone || '');
     }
 
-    function mergeBookings(localArr, remoteArr) {
-        const merged = [...(localArr || [])];
-        const localKeys = new Set(merged.map(bookingKey));
-        (remoteArr || []).forEach(b => {
-            if (!localKeys.has(bookingKey(b))) {
+    // ============ دمج ذكي: السيرفر أولاً ثم المحلي ============
+    function mergeBookings(remoteArr, localArr) {
+        // نبدأ بالسيرفر (المصدر الأحدث) ثم نضيف ما يوجد محلياً فقط
+        const merged = [...(remoteArr || [])];
+        const remoteKeys = new Set(merged.map(bookingKey));
+        (localArr || []).forEach(b => {
+            if (!remoteKeys.has(bookingKey(b))) {
                 merged.push(b);
-                localKeys.add(bookingKey(b));
+                remoteKeys.add(bookingKey(b));
             }
         });
         return merged;
     }
 
-    function mergeGroups(localArr, remoteArr) {
+    function mergeGroups(remoteArr, localArr) {
         const merged = [];
         const allNames = new Set([
-            ...(localArr || []).map(g => g.name),
-            ...(remoteArr || []).map(g => g.name)
+            ...(remoteArr || []).map(g => g.name),
+            ...(localArr || []).map(g => g.name)
         ]);
         allNames.forEach(name => {
-            const localG = (localArr || []).find(g => g.name === name);
             const remoteG = (remoteArr || []).find(g => g.name === name);
-            if (localG && remoteG) {
+            const localG = (localArr || []).find(g => g.name === name);
+            if (remoteG && localG) {
+                // السيرفر أولوية، لكن إذا كانت السعة المحلية مختلفة نستخدم الأكبر
                 merged.push({
                     name: name,
-                    capacity: remoteG.capacity || localG.capacity || DEFAULT_CAPACITY,
+                    capacity: Math.max(remoteG.capacity || 30, localG.capacity || 30),
                     closed: remoteG.closed !== undefined ? remoteG.closed : (localG.closed !== undefined ? localG.closed : false)
                 });
-            } else if (localG) {
-                merged.push({...localG});
             } else if (remoteG) {
                 merged.push({...remoteG});
+            } else if (localG) {
+                merged.push({...localG});
             }
         });
         return merged;
     }
 
-    // ============ تحميل البيانات (دمج ذكي) ============
+    // ============ تحديث مؤشر حالة الاتصال ============
+    function updateSyncStatus(status, message) {
+        lastSyncStatus = status;
+        const el = document.getElementById('syncStatus');
+        if (!el) return;
+        if (status === 'success') {
+            el.innerHTML = '🟢 متصل بالسيرفر — ' + (message || 'تم التزامن');
+            el.style.color = '#06D6A0';
+        } else if (status === 'error') {
+            el.innerHTML = '🔴 غير متصل — ' + (message || 'يعمل بالوضع المحلي');
+            el.style.color = '#EF476F';
+        } else if (status === 'syncing') {
+            el.innerHTML = '🟡 جاري التزامن...';
+            el.style.color = '#f0a500';
+        } else {
+            el.innerHTML = '⚪ في انتظار الاتصال...';
+            el.style.color = '#9b8aa0';
+        }
+    }
+
+    // ============ تحميل البيانات (السيرفر أولاً) ============
     async function loadData() {
-        // 1. قراءة المحلي أولاً
+        updateSyncStatus('syncing');
+
+        // 1. قراءة المحلي (احتياطي)
         let localGroups = [], localBookings = [];
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
             if (Array.isArray(lg)) localGroups = lg;
             if (Array.isArray(lb)) localBookings = lb;
-        } catch (e) {}
+        } catch (e) {
+            console.warn('خطأ في قراءة localStorage:', e);
+        }
 
         // 2. قراءة السيرفر
         let remoteGroups = [], remoteBookings = [];
         let serverOk = false;
-        if (JSONBLOB_ID) {
-            try {
-                const res = await fetch(getBlobUrl(), {
-                    headers: { 'Accept': 'application/json' },
-                    cache: 'no-store'
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data.groups)) remoteGroups = data.groups;
-                    if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
-                    serverOk = true;
-                }
-            } catch (err) {
-                console.warn('تعذر الاتصال بالسيرفر، سيتم الاعتماد على البيانات المحلية');
-            }
+
+        if (!JSONBLOB_ID) {
+            console.log('لا يوجد JSONBLOB_ID، سيتم الاعتماد على البيانات المحلية');
+            groups = localGroups;
+            bookings = localBookings;
+            updateSyncStatus('error', 'لا يوجد رابط سيرفر');
+            return false;
         }
 
-        // 3. دمج: السيرفر + المحلي = الاتحاد (لا يُحذف شيء)
+        try {
+            console.log('جاري الاتصال بالسيرفر:', getBlobUrl());
+            const res = await fetch(getBlobUrl(), {
+                headers: { 'Accept': 'application/json' },
+                cache: 'no-store'
+            });
+
+            if (!res.ok) {
+                throw new Error('HTTP ' + res.status + ' ' + res.statusText);
+            }
+
+            const data = await res.json();
+            console.log('تم الاتصال بالسيرفر بنجاح:', data);
+
+            if (Array.isArray(data.groups)) remoteGroups = data.groups;
+            if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
+
+            serverOk = true;
+            updateSyncStatus('success', 'آخر تحديث: ' + new Date().toLocaleTimeString('ar-EG'));
+
+        } catch (err) {
+            console.warn('⚠️ تعذر الاتصال بالسيرفر:', err.message);
+            updateSyncStatus('error', err.message);
+        }
+
+        // 3. دمج: السيرفر أولاً ثم المحلي
         if (serverOk) {
-            groups = mergeGroups(localGroups, remoteGroups);
-            bookings = mergeBookings(localBookings, remoteBookings);
+            groups = mergeGroups(remoteGroups, localGroups);
+            bookings = mergeBookings(remoteBookings, localBookings);
+            console.log('تم دمج البيانات — مجموعات:', groups.length, 'حجوزات:', bookings.length);
         } else {
             groups = localGroups;
             bookings = localBookings;
+            console.log('الاعتماد على البيانات المحلية — مجموعات:', groups.length, 'حجوزات:', bookings.length);
         }
 
         // 4. حفظ النتيجة المدمجة محلياً
         try {
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
-        } catch (e) {}
+        } catch (e) {
+            console.warn('خطأ في حفظ localStorage:', e);
+        }
 
         return serverOk;
     }
 
-    // ============ حفظ البيانات (سيرفر أولاً، ثم محلي) ============
+    // ============ حفظ البيانات (سيرفر + محلي) ============
     async function saveData() {
-        // 1. حفظ محلي فوراً (أمان)
+        // 1. حفظ محلي فوراً
         try {
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
-        } catch (e) {}
+            console.log('تم الحفظ محلياً');
+        } catch (e) {
+            console.warn('خطأ في حفظ localStorage:', e);
+        }
 
         // 2. إنشاء blob جديد إن لم يكن موجوداً
         if (!JSONBLOB_ID) {
             try {
+                console.log('جاري إنشاء blob جديد...');
                 const res = await fetch('https://jsonblob.com/api/jsonBlob', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1160,24 +1219,34 @@
                     if (id) {
                         JSONBLOB_ID = id;
                         localStorage.setItem('bookingBlobId', id);
+                        console.log('تم إنشاء blob جديد:', id);
+                        updateSyncStatus('success', 'تم إنشاء رابط جديد');
                     }
                 }
             } catch (e) {
-                console.error('إنشاء Blob فشل', e);
-                return;
+                console.error('إنشاء Blob فشل:', e);
+                updateSyncStatus('error', 'فشل إنشاء رابط');
             }
         }
         if (!JSONBLOB_ID) return;
 
         // 3. رفع على السيرفر
         try {
-            await fetch(getBlobUrl(), {
+            console.log('جاري الرفع على السيرفر...');
+            const res = await fetch(getBlobUrl(), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ groups, bookings })
             });
+            if (res.ok) {
+                console.log('تم الرفع على السيرفر بنجاح');
+                updateSyncStatus('success', 'تم الحفظ على السيرفر');
+            } else {
+                throw new Error('HTTP ' + res.status);
+            }
         } catch (err) {
-            console.warn('تعذر الحفظ على السيرفر، البيانات محفوظة محلياً فقط');
+            console.warn('⚠️ تعذر الحفظ على السيرفر:', err.message);
+            updateSyncStatus('error', 'لم يُحفظ على السيرفر');
         }
     }
 
@@ -1185,6 +1254,7 @@
     let knownBookingKeys = null;
 
     async function refreshFromServer() {
+        console.log('=== تحديث دوري ===');
         await loadData();
         renderGroups();
         renderBookings();
@@ -1212,7 +1282,6 @@
         });
         knownBookingKeys = currentKeys;
     }
-
     // ============================================================
     // ============ DONNÉES ============
     // ============================================================
@@ -1552,6 +1621,12 @@
         let html = '';
         const reversed = [...bookings].reverse();
         reversed.forEach(b => {
+            const adminActions = isAdmin 
+                ? '<div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">' +
+                    '<button class="copy-link-btn" style="background:#e1f7f0; color:#0a4b3a;" onclick="openEditModal(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)">✏️ تعديل</button>' +
+                    '<button class="copy-link-btn" style="background:#ffd8d8; color:#b0003a;" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)">🗑️ حذف</button>' +
+                  '</div>'
+                : '';
             html += '<div class="booking-card">' +
                 '<div class="student-name">👤 ' + b.studentName + '</div>' +
                 '<div class="details">' +
@@ -1561,6 +1636,7 @@
                     '<span>📞 ولي: ' + b.parentPhone + '</span>' +
                 '</div>' +
                 '<div class="timestamp">🕒 ' + (b.timestamp || 'وقت غير محدد') + '</div>' +
+                adminActions +
             '</div>';
         });
         bookingsList.innerHTML = html;
@@ -1590,6 +1666,7 @@
                     '<div class="m-time">🕒 ' + (b.timestamp || 'وقت غير محدد') + '</div>' +
                 '</div>' +
                 '<div class="m-actions">' +
+                    '<button class="del-student-btn" onclick="openEditModal(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="تعديل" style="background:#e1f7f0; color:#0a4b3a;">✎</button>' +
                     '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' +
                 '</div>' +
             '</div>';
@@ -1624,7 +1701,12 @@
                 studentsInGroup.forEach((b, i) => {
                     studentsHtml += '<div class="gw-student">' +
                         '<span>' + (i + 1) + '. 👤 ' + b.studentName + ' — 📘 ' + b.stage + '</span>' +
-                        (isAdmin ? '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' : '') +
+                        (isAdmin 
+                            ? '<span style="display:flex; gap:4px;">' +
+                                '<button class="del-student-btn" onclick="openEditModal(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="تعديل" style="background:#e1f7f0; color:#0a4b3a; width:24px; height:24px; font-size:0.8rem;">✎</button>' +
+                                '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' +
+                              '</span>'
+                            : '') +
                     '</div>';
                 });
             }
@@ -1914,12 +1996,114 @@
     // ============================================================
     // ============ INITIALISATION ============
     // ============================================================
-    function init() {
-        loadData().then(() => {
-            renderGroups();
-            renderBookings();
-            updateAdminUI();
+    
+    // ============================================================
+    // ============ تعديل بيانات الطالب ============
+    // ============================================================
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const editModalCloseBtn = document.getElementById('editModalCloseBtn');
+    const editGroupSelect = document.getElementById('editGroupSelect');
+
+    function openEditModal(studentName, group) {
+        if (!isAdmin) {
+            alert('⚠️ تعديل البيانات خاصية للمشرف فقط!');
+            return;
+        }
+
+        const b = bookings.find(x => x.studentName === studentName && x.group === group);
+        if (!b) {
+            alert('⚠️ لم يتم العثور على هذا الطالب');
+            return;
+        }
+
+        // Fill the form
+        document.getElementById('editOldName').value = studentName;
+        document.getElementById('editOldGroup').value = group;
+        document.getElementById('editStage').value = b.stage || 'ابتدائي';
+        document.getElementById('editStudentName').value = b.studentName || '';
+        document.getElementById('editStudentPhone').value = b.studentPhone || '';
+        document.getElementById('editParentPhone').value = b.parentPhone || '';
+
+        // Fill group select
+        editGroupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
+        groups.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g.name;
+            opt.textContent = g.name + ' (' + getGroupCount(g.name) + '/' + g.capacity + ')';
+            if (g.name === b.group) opt.selected = true;
+            editGroupSelect.appendChild(opt);
         });
+
+        editModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+        editModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    async function handleEdit(e) {
+        e.preventDefault();
+
+        const oldName = document.getElementById('editOldName').value;
+        const oldGroup = document.getElementById('editOldGroup').value;
+
+        const stage = document.getElementById('editStage').value;
+        const studentName = document.getElementById('editStudentName').value.trim();
+        const studentPhone = document.getElementById('editStudentPhone').value.trim();
+        const parentPhone = document.getElementById('editParentPhone').value.trim();
+        const group = editGroupSelect.value;
+
+        if (!stage || !studentName || !studentPhone || !parentPhone || !group) {
+            alert('الرجاء ملء جميع الحقول!');
+            return;
+        }
+
+        // Find and update the booking
+        const idx = bookings.findIndex(b => b.studentName === oldName && b.group === oldGroup);
+        if (idx === -1) {
+            alert('⚠️ لم يتم العثور على الحجز الأصلي');
+            return;
+        }
+
+        // Check if new group is full (and different from old)
+        if (group !== oldGroup) {
+            const groupObj = groups.find(g => g.name === group);
+            if (groupObj && isGroupClosed(groupObj)) {
+                alert('🔒 المجموعة الجديدة مغلقة');
+                return;
+            }
+            if (groupObj && isGroupFull(groupObj)) {
+                alert('⚠️ المجموعة الجديدة مكتملة');
+                return;
+            }
+        }
+
+        bookings[idx] = {
+            stage,
+            studentName,
+            studentPhone,
+            parentPhone,
+            group,
+            timestamp: bookings[idx].timestamp || new Date().toLocaleString('ar-EG', { hour12: true })
+        };
+
+        await saveData();
+        refreshFromServer();
+        closeEditModal();
+        alert('✅ تم تعديل البيانات بنجاح');
+    }
+
+    window.openEditModal = openEditModal;
+
+async function init() {
+        // تحميل البيانات أولاً ثم عرضها
+        await loadData();
+        renderGroups();
+        renderBookings();
+        updateAdminUI();
 
         bookingForm.addEventListener('submit', handleBooking);
         addGroupBtn.addEventListener('click', addGroup);
@@ -1947,6 +2131,11 @@
             if (e.target === this) closeImportModal();
         });
         importFileBtn.addEventListener('click', importDataFromFile);
+        document.getElementById('manualSyncBtn').addEventListener('click', async function() {
+            updateSyncStatus('syncing', 'جاري التحديث اليدوي...');
+            await refreshFromServer();
+            showToast('✅ تم التحديث', 'تم تحديث البيانات من السيرفر يدوياً');
+        });
 
         document.getElementById('fileInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -1960,8 +2149,15 @@
                 closeAdminPanel(); 
                 closeGroupsWindow();
                 closeImportModal();
+                closeEditModal();
             }
         });
+
+        editModalCloseBtn.addEventListener('click', closeEditModal);
+        editModal.addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+        editForm.addEventListener('submit', handleEdit);
 
         startSync();
     }
@@ -1971,6 +2167,54 @@
 
     init();
 </script>
+
+
+<!-- نافذة تعديل بيانات الطالب -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <button class="modal-close" id="editModalCloseBtn">✕</button>
+        <h2>✏️ تعديل بيانات الطالب</h2>
+        <p class="subtitle">قم بتعديل البيانات المطلوبة ثم اضغط حفظ</p>
+
+        <form id="editForm" style="margin-top:15px;">
+            <input type="hidden" id="editOldName">
+            <input type="hidden" id="editOldGroup">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editStage">المرحلة الدراسية</label>
+                    <select id="editStage" required>
+                        <option value="ابتدائي">ابتدائي</option>
+                        <option value="إعدادي">إعدادي</option>
+                        <option value="ثانوي">ثانوي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editStudentName">اسم الطالب</label>
+                    <input type="text" id="editStudentName" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editStudentPhone">تليفون الطالب</label>
+                    <input type="tel" id="editStudentPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="editParentPhone">تليفون ولي الأمر</label>
+                    <input type="tel" id="editParentPhone" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="editGroupSelect">المجموعة</label>
+                <select id="editGroupSelect" required></select>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top:10px;">💾 حفظ التعديلات</button>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>
