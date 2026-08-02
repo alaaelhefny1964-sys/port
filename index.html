@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* جميع الأنماط كما هي مع إضافة بعض التعديلات */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Cairo', sans-serif;
@@ -262,6 +261,10 @@
             color: #3d2a4b;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
+        .group-tag .group-name-only {
+            font-weight: 600;
+            color: #3d2a4b;
+        }
         .toast-container {
             position: fixed;
             top: 18px;
@@ -334,6 +337,10 @@
             color: white;
         }
         .group-tag.closed .lock-group:hover { background: #05b88a; }
+        .group-tag .lock-group.admin-only {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .gw-lock-btn {
             background: #fff1cf;
             border: none;
@@ -347,6 +354,10 @@
             font-family: 'Cairo', sans-serif;
         }
         .gw-lock-btn:hover { background: #ffe1a1; }
+        .gw-lock-btn.admin-only {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .group-window-card.closed {
             border-right-color: #a06d00;
             background: #fffaf0;
@@ -379,6 +390,10 @@
             background: #ffb3b3;
             transform: scale(1.1);
         }
+        .group-tag .del-group.admin-only {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .add-group-form {
             display: flex;
             gap: 10px;
@@ -405,6 +420,10 @@
             font-family: 'Cairo', sans-serif;
         }
         .add-group-form button:hover { background: #7d44b8; }
+        .add-group-form button.admin-only {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .add-group-form input[type="number"] { flex: 0 0 130px; }
         .group-window-card {
             background: #fcf8f2;
@@ -495,6 +514,10 @@
         .gw-student .del-student-btn:hover {
             background: #ffb3b3;
             transform: scale(1.1);
+        }
+        .gw-student .del-student-btn.admin-only {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         .gw-empty {
             font-size: 0.9rem;
@@ -819,6 +842,26 @@
             font-family: 'Cairo', sans-serif;
         }
         .import-section .import-btn:hover { background: #7d44b8; }
+        .admin-lock-icon {
+            display: inline-block;
+            background: #2d1b3d;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 30px;
+            margin-right: 8px;
+            font-weight: 700;
+        }
+        .admin-mode-badge {
+            display: inline-block;
+            background: #06D6A0;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-right: 8px;
+        }
         @keyframes fadeSlide {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -906,14 +949,16 @@
     </div>
 
     <div class="groups-manager" id="groupsManager">
-        <h3>📚 إدارة المجموعات</h3>
+        <h3>📚 إدارة المجموعات <span id="adminModeBadge"></span></h3>
         <div id="groupTagsContainer" class="group-tags"></div>
-        <div class="add-group-form">
+        <div class="add-group-form" id="addGroupForm">
             <input type="text" id="newGroupInput" placeholder="اسم مجموعة جديدة...">
             <input type="number" id="newGroupCapacityInput" placeholder="الحد الأقصى" min="1" value="30">
             <button id="addGroupBtn">➕ إضافة</button>
         </div>
-        <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">المجموعات المضافة تظهر في قائمة الحجز. الحد الأقصى الافتراضي 30 طالب، وتُقفل المجموعة تلقائياً عند اكتمال العدد.</p>
+        <p style="font-size:0.8rem; color:#7a5e7e; margin-top:10px;">
+            المجموعات المضافة تظهر في قائمة الحجز. الحد الأقصى الافتراضي 30 طالب، وتُقفل المجموعة تلقائياً عند اكتمال العدد.
+        </p>
     </div>
 
     <div class="bookings-section" id="bookingsSection">
@@ -922,7 +967,7 @@
     </div>
 
     <div class="admin-btn-container">
-        <button class="admin-btn" id="adminPanelBtn">🔐 لوحة التحكم</button>
+        <button class="admin-btn" id="adminPanelBtn">🔐 دخول المدير</button>
         <button class="admin-btn green" id="groupsWindowBtn">📚 عرض المجموعات</button>
         <button class="admin-btn orange" id="exportDataBtn">📥 تصدير البيانات</button>
         <button class="admin-btn" id="importDataBtn" style="background:linear-gradient(135deg, #FF6B6B, #ee5a24);">📤 استيراد البيانات</button>
@@ -935,7 +980,7 @@
         <button class="modal-close" id="importModalCloseBtn">✕</button>
         <h2>📤 استيراد البيانات</h2>
         <p class="subtitle">قم برفع ملف JSON لاستيراد المجموعات والحجوزات</p>
-        
+
         <div class="import-section">
             <h4>📂 اختر ملف البيانات</h4>
             <div class="file-input-wrapper">
@@ -947,7 +992,7 @@
             </p>
             <div id="importStatus" style="margin-top:10px; font-weight:700; color:#5f2d8a;"></div>
         </div>
-        
+
         <div style="text-align:center; margin-top:20px;">
             <button class="modal-export-btn" id="importModalCloseBtn2" style="background:#9B5DE5;">إغلاق</button>
         </div>
@@ -959,14 +1004,14 @@
         <button class="modal-close" id="modalCloseBtn">✕</button>
         <h2>📊 لوحة تحكم المشرف</h2>
         <p class="subtitle">جميع الحجوزات المسجلة من جميع الأجهزة</p>
-        
+
         <div class="modal-stats" id="modalStats">
             <div class="stat-item">📌 إجمالي الحجوزات: <span id="totalCount">0</span></div>
             <div class="stat-item">📚 عدد المجموعات: <span id="groupCount">0</span></div>
         </div>
-        
+
         <div id="modalBookingsList"></div>
-        
+
         <div style="text-align:center; margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
             <button class="modal-export-btn" id="exportBtn">📥 تنزيل البيانات (Excel + نص)</button>
             <button class="modal-export-btn danger" id="clearAllBtn">🗑️ تفريغ البرنامج بالكامل</button>
@@ -992,7 +1037,7 @@
 
 <script>
     // ============================================================
-    // ============ BASE DE DONNÉES PARTAGÉE ============
+    // ============ تزامن تلقائي ثنائي الاتجاه ============
     // ============================================================
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
@@ -1003,57 +1048,105 @@
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
 
-    // ============================================================
-    // ============ DONNÉES ============
-    // ============================================================
-    let groups = [];
-    let bookings = [];
-    const DEFAULT_CAPACITY = 30;
+    // ============ دمج ذكي للبيانات ============
+    function bookingKey(b) {
+        return [b.studentName, b.group, b.timestamp].join('|');
+    }
 
-    // ============================================================
-    // ============ CHARGEMENT / SAUVEGARDE ============
-    // ============================================================
+    function mergeBookings(localArr, remoteArr) {
+        const merged = [...(localArr || [])];
+        const localKeys = new Set(merged.map(bookingKey));
+        (remoteArr || []).forEach(b => {
+            if (!localKeys.has(bookingKey(b))) {
+                merged.push(b);
+                localKeys.add(bookingKey(b));
+            }
+        });
+        return merged;
+    }
+
+    function mergeGroups(localArr, remoteArr) {
+        const merged = [];
+        const allNames = new Set([
+            ...(localArr || []).map(g => g.name),
+            ...(remoteArr || []).map(g => g.name)
+        ]);
+        allNames.forEach(name => {
+            const localG = (localArr || []).find(g => g.name === name);
+            const remoteG = (remoteArr || []).find(g => g.name === name);
+            if (localG && remoteG) {
+                merged.push({
+                    name: name,
+                    capacity: remoteG.capacity || localG.capacity || DEFAULT_CAPACITY,
+                    closed: remoteG.closed !== undefined ? remoteG.closed : (localG.closed !== undefined ? localG.closed : false)
+                });
+            } else if (localG) {
+                merged.push({...localG});
+            } else if (remoteG) {
+                merged.push({...remoteG});
+            }
+        });
+        return merged;
+    }
+
+    // ============ تحميل البيانات (دمج ذكي) ============
     async function loadData() {
+        // 1. قراءة المحلي أولاً
+        let localGroups = [], localBookings = [];
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
-            if (Array.isArray(lg) && lg.length) groups = lg;
-            if (Array.isArray(lb)) bookings = lb;
+            if (Array.isArray(lg)) localGroups = lg;
+            if (Array.isArray(lb)) localBookings = lb;
         } catch (e) {}
 
-        if (!JSONBLOB_ID) return false;
-        try {
-            const res = await fetch(getBlobUrl(), {
-                headers: { 'Accept': 'application/json' }
-            });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            
-            if (Array.isArray(data.groups)) {
-                groups = data.groups;
-            }
-            
-            if (Array.isArray(data.bookings)) {
-                bookings = data.bookings;
-            }
-            
+        // 2. قراءة السيرفر
+        let remoteGroups = [], remoteBookings = [];
+        let serverOk = false;
+        if (JSONBLOB_ID) {
             try {
-                localStorage.setItem('bookingGroups', JSON.stringify(groups));
-                localStorage.setItem('bookingList', JSON.stringify(bookings));
-            } catch (e) {}
-            return true;
-        } catch (err) {
-            console.error('تعذر تحميل البيانات:', err);
-            return false;
+                const res = await fetch(getBlobUrl(), {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data.groups)) remoteGroups = data.groups;
+                    if (Array.isArray(data.bookings)) remoteBookings = data.bookings;
+                    serverOk = true;
+                }
+            } catch (err) {
+                console.warn('تعذر الاتصال بالسيرفر، سيتم الاعتماد على البيانات المحلية');
+            }
         }
-    }
 
-    async function saveData() {
+        // 3. دمج: السيرفر + المحلي = الاتحاد (لا يُحذف شيء)
+        if (serverOk) {
+            groups = mergeGroups(localGroups, remoteGroups);
+            bookings = mergeBookings(localBookings, remoteBookings);
+        } else {
+            groups = localGroups;
+            bookings = localBookings;
+        }
+
+        // 4. حفظ النتيجة المدمجة محلياً
         try {
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
         } catch (e) {}
 
+        return serverOk;
+    }
+
+    // ============ حفظ البيانات (سيرفر أولاً، ثم محلي) ============
+    async function saveData() {
+        // 1. حفظ محلي فوراً (أمان)
+        try {
+            localStorage.setItem('bookingGroups', JSON.stringify(groups));
+            localStorage.setItem('bookingList', JSON.stringify(bookings));
+        } catch (e) {}
+
+        // 2. إنشاء blob جديد إن لم يكن موجوداً
         if (!JSONBLOB_ID) {
             try {
                 const res = await fetch('https://jsonblob.com/api/jsonBlob', {
@@ -1067,30 +1160,29 @@
                     if (id) {
                         JSONBLOB_ID = id;
                         localStorage.setItem('bookingBlobId', id);
-                        console.log('JSONBLOB_ID الجديد:', id);
                     }
                 }
             } catch (e) {
                 console.error('إنشاء Blob فشل', e);
+                return;
             }
         }
         if (!JSONBLOB_ID) return;
 
+        // 3. رفع على السيرفر
         try {
             await fetch(getBlobUrl(), {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ groups, bookings })
             });
         } catch (err) {
-            console.error('تعذر حفظ البيانات:', err);
+            console.warn('تعذر الحفظ على السيرفر، البيانات محفوظة محلياً فقط');
         }
     }
 
-    let autoOpenedGroupsOnce = false;
+    // ============ تحديث دوري من السيرفر ============
+    let knownBookingKeys = null;
 
     async function refreshFromServer() {
         await loadData();
@@ -1098,19 +1190,35 @@
         renderBookings();
         if (document.getElementById('adminModal').classList.contains('active')) renderAdminBookings();
         if (document.getElementById('groupsModal').classList.contains('active')) renderGroupsWindow();
-
-        if (!autoOpenedGroupsOnce && groups.length > 0) {
-            autoOpenedGroupsOnce = true;
-            // لا نفتح تلقائياً حتى لا يزعج المستخدم
-        } else if (!autoOpenedGroupsOnce) {
-            autoOpenedGroupsOnce = true;
-        }
+        checkForNewBookings();
     }
 
     function startSync() {
         refreshFromServer();
         setInterval(refreshFromServer, POLL_INTERVAL_MS);
     }
+
+    function checkForNewBookings() {
+        const currentKeys = new Set(bookings.map(bookingKey));
+        if (knownBookingKeys === null) {
+            knownBookingKeys = currentKeys;
+            return;
+        }
+        bookings.forEach(b => {
+            const key = bookingKey(b);
+            if (!knownBookingKeys.has(key)) {
+                showToast('🎉 تسجيل جديد', 'الطالب <strong>' + b.studentName + '</strong> سجل في مجموعة "' + b.group + '"');
+            }
+        });
+        knownBookingKeys = currentKeys;
+    }
+
+    // ============================================================
+    // ============ DONNÉES ============
+    // ============================================================
+    let groups = [];
+    let bookings = [];
+    const DEFAULT_CAPACITY = 30;
 
     // ============================================================
     // ============ FONCTIONS MÉTIER ============
@@ -1128,50 +1236,14 @@
     }
 
     // ============================================================
-    // ============ إشعارات التسجيل الجديدة ============
-    // ============================================================
-    let knownBookingKeys = null;
-
-    function bookingKey(b) {
-        return [b.studentName, b.group, b.timestamp].join('|');
-    }
-
-    function showToast(title, message) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<span class="toast-title">${title}</span>${message}`;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 6000);
-    }
-
-    function checkForNewBookings() {
-        const currentKeys = new Set(bookings.map(bookingKey));
-
-        if (knownBookingKeys === null) {
-            knownBookingKeys = currentKeys;
-            return;
-        }
-
-        bookings.forEach(b => {
-            const key = bookingKey(b);
-            if (!knownBookingKeys.has(key)) {
-                showToast('🎉 تسجيل جديد', `الطالب <strong>${b.studentName}</strong> سجّل في مجموعة "${b.group}"`);
-            }
-        });
-
-        knownBookingKeys = currentKeys;
-    }
-
-    // ============================================================
     // ============ SUPPRESSION D'UN ÉTUDIANT ============
     // ============================================================
     async function deleteStudent(studentName, group) {
         if (!isAdmin) {
-            alert('⚠️ هذه الخاصية للمشرف فقط!');
+            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
             return;
         }
-        if (!confirm(`❓ هل أنت متأكد من حذف الطالب "${studentName}" من مجموعة "${group}"؟`)) return;
+        if (!confirm('❓ هل أنت متأكد من حذف الطالب "' + studentName + '" من مجموعة "' + group + '"؟')) return;
 
         const idx = bookings.findIndex(b => b.studentName === studentName && b.group === group);
         if (idx === -1) {
@@ -1182,7 +1254,7 @@
         bookings.splice(idx, 1);
         await saveData();
         refreshFromServer();
-        alert(`✅ تم حذف الطالب "${studentName}" بنجاح`);
+        alert('✅ تم حذف الطالب "' + studentName + '" بنجاح');
     }
 
     // ============================================================
@@ -1190,11 +1262,11 @@
     // ============================================================
     async function clearAllData() {
         if (!isAdmin) {
-            alert('⚠️ هذه الخاصية للمشرف فقط!');
+            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
             return;
         }
         if (!confirm('🔴 تحذير!! أنت على وشك حذف جميع الحجوزات والمجموعات نهائياً.\nهل أنت متأكد تماماً؟')) return;
-        
+
         const response = prompt('🔴 تأكيد نهائي: اكتب "نعم" للتأكيد:');
         if (response !== 'نعم') {
             alert('❌ تم إلغاء العملية');
@@ -1221,24 +1293,28 @@
             exportedAt: new Date().toISOString(),
             version: '1.0'
         };
-        
+
         const json = JSON.stringify(data, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        
+
         const a = document.createElement('a');
         a.href = url;
-        a.download = `بيانات_الحجوزات_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = 'بيانات_الحجوزات_' + new Date().toISOString().slice(0,10) + '.json';
         a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 2000);
-        
+
         alert('✅ تم تصدير البيانات بنجاح!');
     }
 
     function openImportModal() {
+        if (!isAdmin) {
+            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
+            return;
+        }
         document.getElementById('importModal').classList.add('active');
         document.body.style.overflow = 'hidden';
         document.getElementById('importStatus').textContent = '';
@@ -1251,67 +1327,79 @@
     }
 
     function importDataFromFile() {
+        if (!isAdmin) {
+            alert('⚠️ هذه الخاصية للمشرف فقط! يرجى تسجيل الدخول كمدير.');
+            return;
+        }
+
         const fileInput = document.getElementById('fileInput');
         const status = document.getElementById('importStatus');
-        
+
         if (!fileInput.files || fileInput.files.length === 0) {
             status.textContent = '⚠️ الرجاء اختيار ملف أولاً';
             status.style.color = '#b0003a';
             return;
         }
-        
+
         const file = fileInput.files[0];
         if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
             status.textContent = '⚠️ الرجاء اختيار ملف JSON صالح';
             status.style.color = '#b0003a';
             return;
         }
-        
+
         const reader = new FileReader();
         reader.onload = async function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                
-                // التحقق من صحة البيانات
+
                 if (!data.groups || !Array.isArray(data.groups)) {
                     throw new Error('الملف لا يحتوي على مجموعة صالحة');
                 }
                 if (!data.bookings || !Array.isArray(data.bookings)) {
                     throw new Error('الملف لا يحتوي على حجوزات صالحة');
                 }
-                
+
                 status.textContent = '⏳ جاري استيراد البيانات...';
                 status.style.color = '#5f2d8a';
-                
-                // استيراد البيانات
+
                 groups = data.groups;
                 bookings = data.bookings;
-                
-                // حفظ البيانات
+
                 await saveData();
                 refreshFromServer();
-                
-                status.textContent = `✅ تم استيراد ${bookings.length} حجز و ${groups.length} مجموعة بنجاح!`;
+
+                status.textContent = '✅ تم استيراد ' + bookings.length + ' حجز و ' + groups.length + ' مجموعة بنجاح!';
                 status.style.color = '#06D6A0';
-                
-                // إغلاق النافذة بعد 2 ثانية
+
                 setTimeout(() => {
                     closeImportModal();
                 }, 2000);
-                
+
             } catch (err) {
-                status.textContent = `❌ خطأ: ${err.message}`;
+                status.textContent = '❌ خطأ: ' + err.message;
                 status.style.color = '#b0003a';
                 console.error('خطأ في الاستيراد:', err);
             }
         };
-        
+
         reader.onerror = function() {
             status.textContent = '❌ حدث خطأ أثناء قراءة الملف';
             status.style.color = '#b0003a';
         };
-        
+
         reader.readAsText(file);
+    }
+
+    // ============================================================
+    // ============ التحقق من صلاحية المدير ============
+    // ============================================================
+    function requireAdmin(actionName) {
+        if (!isAdmin) {
+            alert('⚠️ هذه الخاصية (' + actionName + ') للمشرف فقط!\nيرجى الضغط على "🔐 دخول المدير" وإدخال كلمة المرور.');
+            return false;
+        }
+        return true;
     }
 
     // ============================================================
@@ -1324,6 +1412,7 @@
     const bookingsList = document.getElementById('bookingsList');
     const confirmationBox = document.getElementById('confirmationBox');
     const bookingForm = document.getElementById('bookingForm');
+    const adminModeBadge = document.getElementById('adminModeBadge');
 
     const adminPanelBtn = document.getElementById('adminPanelBtn');
     const adminModal = document.getElementById('adminModal');
@@ -1340,7 +1429,6 @@
     const groupsModalCloseBtn = document.getElementById('groupsModalCloseBtn');
     const groupsWindowList = document.getElementById('groupsWindowList');
 
-    // أزرار التصدير والاستيراد
     const exportDataBtn = document.getElementById('exportDataBtn');
     const importDataBtn = document.getElementById('importDataBtn');
     const importModal = document.getElementById('importModal');
@@ -1348,9 +1436,27 @@
     const importModalCloseBtn2 = document.getElementById('importModalCloseBtn2');
     const importFileBtn = document.getElementById('importFileBtn');
 
+    function updateAdminUI() {
+        if (isAdmin) {
+            adminModeBadge.innerHTML = '<span class="admin-mode-badge">🔓 وضع المدير</span>';
+            adminPanelBtn.textContent = '🔓 تسجيل خروج المدير';
+            adminPanelBtn.style.background = 'linear-gradient(135deg, #EF476F, #b0003a)';
+        } else {
+            adminModeBadge.innerHTML = '';
+            adminPanelBtn.textContent = '🔐 دخول المدير';
+            adminPanelBtn.style.background = 'linear-gradient(135deg, #2d1b3d, #5f2d8a)';
+        }
+
+        const addGroupForm = document.getElementById('addGroupForm');
+        addGroupForm.style.display = isAdmin ? 'flex' : 'none';
+
+        renderGroups();
+        if (document.getElementById('groupsModal').classList.contains('active')) renderGroupsWindow();
+    }
+
     function renderGroups() {
         groupSelect.innerHTML = '<option value="">-- اختر المجموعة --</option>';
-        
+
         if (groups.length === 0) {
             const opt = document.createElement('option');
             opt.value = '';
@@ -1358,11 +1464,17 @@
             opt.disabled = true;
             opt.selected = true;
             groupSelect.appendChild(opt);
-            
-            groupTagsContainer.innerHTML = `<div class="empty-groups-msg">📭 لا توجد مجموعات مسجلة. أضف مجموعة جديدة باستخدام النموذج أدناه.</div>`;
+
+            let msg = '📭 لا توجد مجموعات مسجلة. ';
+            if (isAdmin) {
+                msg += 'أضف مجموعة جديدة باستخدام النموذج أدناه.';
+            } else {
+                msg += 'يرجى الاتصال بالمدير لإضافة مجموعات.';
+            }
+            groupTagsContainer.innerHTML = '<div class="empty-groups-msg">' + msg + '</div>';
             return;
         }
-        
+
         groups.forEach(g => {
             const count = getGroupCount(g.name);
             const full = isGroupFull(g);
@@ -1370,11 +1482,11 @@
             const opt = document.createElement('option');
             opt.value = g.name;
             if (closed) {
-                opt.textContent = `${g.name} (مغلقة 🔒)`;
+                opt.textContent = g.name + ' (مغلقة 🔒)';
             } else if (full) {
-                opt.textContent = `${g.name} (مكتملة 🔒)`;
+                opt.textContent = g.name + ' (مكتملة 🔒)';
             } else {
-                opt.textContent = `${g.name} (${count}/${g.capacity})`;
+                opt.textContent = g.name + ' (' + count + '/' + g.capacity + ')';
             }
             if (closed || full) opt.disabled = true;
             groupSelect.appendChild(opt);
@@ -1387,9 +1499,22 @@
             const closed = isGroupClosed(g);
             const statusLabel = closed ? ' مغلقة يدوياً' : (full ? ' مكتملة' : '');
             const statusColor = closed ? '#a06d00' : (full ? '#b0003a' : '#5f2d8a');
+
             const tag = document.createElement('span');
             tag.className = 'group-tag' + (closed ? ' closed' : '');
-            tag.innerHTML = `${g.name} <span style="font-size:0.8rem;color:${statusColor};">(${count}/${g.capacity}${statusLabel})</span> <button class="lock-group" data-name="${g.name}" title="${closed ? 'فتح المجموعة' : 'غلق المجموعة'}">${closed ? '🔓' : '🔒'}</button> <button class="del-group" data-index="${idx}">✕</button>`;
+
+            let html = g.name + ' <span style="font-size:0.8rem;color:' + statusColor + ';">(' + count + '/' + g.capacity + statusLabel + ')</span>';
+
+            if (isAdmin) {
+                html += ' <button class="lock-group" data-name="' + g.name + '" title="' + (closed ? 'فتح المجموعة' : 'غلق المجموعة') + '">' + (closed ? '🔓' : '🔒') + '</button>';
+                html += ' <button class="del-group" data-index="' + idx + '" title="حذف المجموعة">✕</button>';
+            } else {
+                if (closed) {
+                    html += ' <span style="font-size:0.8rem;color:#a06d00;">🔒</span>';
+                }
+            }
+
+            tag.innerHTML = html;
             groupTagsContainer.appendChild(tag);
         });
 
@@ -1401,7 +1526,13 @@
 
         document.querySelectorAll('.del-group').forEach(btn => {
             btn.addEventListener('click', async function(e) {
+                if (!isAdmin) {
+                    alert('⚠️ هذه الخاصية للمشرف فقط!');
+                    return;
+                }
                 const groupName = groups[parseInt(this.dataset.index)]?.name;
+                if (!confirm('❓ هل أنت متأكد من حذف مجموعة "' + groupName + '"؟')) return;
+
                 await loadData();
                 const idx = groups.findIndex(g => g.name === groupName);
                 if (idx !== -1) groups.splice(idx, 1);
@@ -1415,24 +1546,22 @@
 
     function renderBookings() {
         if (bookings.length === 0) {
-            bookingsList.innerHTML = `<div class="no-bookings">لا توجد حجوزات حتى الآن</div>`;
+            bookingsList.innerHTML = '<div class="no-bookings">لا توجد حجوزات حتى الآن</div>';
             return;
         }
         let html = '';
         const reversed = [...bookings].reverse();
         reversed.forEach(b => {
-            html += `
-                <div class="booking-card">
-                    <div class="student-name">👤 ${b.studentName}</div>
-                    <div class="details">
-                        <span>📘 ${b.stage}</span>
-                        <span>📚 ${b.group}</span>
-                        <span>📞 ${b.studentPhone}</span>
-                        <span>📞 ولي: ${b.parentPhone}</span>
-                    </div>
-                    <div class="timestamp">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
-                </div>
-            `;
+            html += '<div class="booking-card">' +
+                '<div class="student-name">👤 ' + b.studentName + '</div>' +
+                '<div class="details">' +
+                    '<span>📘 ' + b.stage + '</span>' +
+                    '<span>📚 ' + b.group + '</span>' +
+                    '<span>📞 ' + b.studentPhone + '</span>' +
+                    '<span>📞 ولي: ' + b.parentPhone + '</span>' +
+                '</div>' +
+                '<div class="timestamp">🕒 ' + (b.timestamp || 'وقت غير محدد') + '</div>' +
+            '</div>';
         });
         bookingsList.innerHTML = html;
     }
@@ -1442,37 +1571,41 @@
         groupCount.textContent = groups.length;
 
         if (bookings.length === 0) {
-            modalBookingsList.innerHTML = `<div class="modal-empty">📭 لا توجد حجوزات مسجلة حتى الآن</div>`;
+            modalBookingsList.innerHTML = '<div class="modal-empty">📭 لا توجد حجوزات مسجلة حتى الآن</div>';
             return;
         }
 
         let html = '';
         const reversed = [...bookings].reverse();
         reversed.forEach((b, index) => {
-            html += `
-                <div class="modal-booking-card">
-                    <div class="m-info">
-                        <div class="m-name">#${index + 1} 👤 ${b.studentName}</div>
-                        <div class="m-details">
-                            <span>📘 ${b.stage}</span>
-                            <span>📚 ${b.group}</span>
-                            <span>📞 ${b.studentPhone}</span>
-                            <span>📞 ولي: ${b.parentPhone}</span>
-                        </div>
-                        <div class="m-time">🕒 ${b.timestamp || 'وقت غير محدد'}</div>
-                    </div>
-                    <div class="m-actions">
-                        <button class="del-student-btn" onclick="deleteStudent('${b.studentName}', '${b.group}')" title="حذف الطالب">✕</button>
-                    </div>
-                </div>
-            `;
+            html += '<div class="modal-booking-card">' +
+                '<div class="m-info">' +
+                    '<div class="m-name">#' + (index + 1) + ' 👤 ' + b.studentName + '</div>' +
+                    '<div class="m-details">' +
+                        '<span>📘 ' + b.stage + '</span>' +
+                        '<span>📚 ' + b.group + '</span>' +
+                        '<span>📞 ' + b.studentPhone + '</span>' +
+                        '<span>📞 ولي: ' + b.parentPhone + '</span>' +
+                    '</div>' +
+                    '<div class="m-time">🕒 ' + (b.timestamp || 'وقت غير محدد') + '</div>' +
+                '</div>' +
+                '<div class="m-actions">' +
+                    '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' +
+                '</div>' +
+            '</div>';
         });
         modalBookingsList.innerHTML = html;
     }
 
     function renderGroupsWindow() {
         if (groups.length === 0) {
-            groupsWindowList.innerHTML = `<div class="gw-empty">📭 لا توجد مجموعات مسجلة. أضف مجموعة جديدة في قسم "إدارة المجموعات"</div>`;
+            let msg = '📭 لا توجد مجموعات مسجلة. ';
+            if (isAdmin) {
+                msg += 'أضف مجموعة جديدة في قسم "إدارة المجموعات".';
+            } else {
+                msg += 'يرجى الاتصال بالمدير لإضافة مجموعات.';
+            }
+            groupsWindowList.innerHTML = '<div class="gw-empty">' + msg + '</div>';
             return;
         }
 
@@ -1486,29 +1619,25 @@
 
             let studentsHtml = '';
             if (studentsInGroup.length === 0) {
-                studentsHtml = `<div class="gw-empty">لا يوجد طلاب مسجلين في هذه المجموعة بعد</div>`;
+                studentsHtml = '<div class="gw-empty">لا يوجد طلاب مسجلين في هذه المجموعة بعد</div>';
             } else {
                 studentsInGroup.forEach((b, i) => {
-                    studentsHtml += `
-                        <div class="gw-student">
-                            <span>${i + 1}. 👤 ${b.studentName} — 📘 ${b.stage}</span>
-                            ${isAdmin ? `<button class="del-student-btn" onclick="deleteStudent('${b.studentName}', '${b.group}')" title="حذف الطالب">✕</button>` : ''}
-                        </div>
-                    `;
+                    studentsHtml += '<div class="gw-student">' +
+                        '<span>' + (i + 1) + '. 👤 ' + b.studentName + ' — 📘 ' + b.stage + '</span>' +
+                        (isAdmin ? '<button class="del-student-btn" onclick="deleteStudent(&quot;' + b.studentName + '&quot;, &quot;' + b.group + '&quot;)" title="حذف الطالب">✕</button>' : '') +
+                    '</div>';
                 });
             }
 
-            html += `
-                <div class="group-window-card ${closed ? 'closed' : (full ? 'full' : '')}">
-                    <div class="gw-header">
-                        <span class="gw-name">📁 ${g.name}</span>
-                        <span class="gw-count">${count} / ${g.capacity} ${closed ? '🔒 مغلقة يدوياً' : (full ? '🔒 مكتملة' : '')}</span>
-                        <button class="gw-lock-btn" onclick="toggleGroupLock('${g.name}')">${closed ? '🔓 فتح المجموعة' : '🔒 غلق المجموعة'}</button>
-                    </div>
-                    <div class="gw-progress"><div class="gw-progress-bar" style="width:${percent}%"></div></div>
-                    <div class="gw-students">${studentsHtml}</div>
-                </div>
-            `;
+            html += '<div class="group-window-card ' + (closed ? 'closed' : (full ? 'full' : '')) + '">' +
+                '<div class="gw-header">' +
+                    '<span class="gw-name">📁 ' + g.name + '</span>' +
+                    '<span class="gw-count">' + count + ' / ' + g.capacity + ' ' + (closed ? '🔒 مغلقة يدوياً' : (full ? '🔒 مكتملة' : '')) + '</span>' +
+                    (isAdmin ? '<button class="gw-lock-btn" onclick="toggleGroupLock(&quot;' + g.name + '&quot;)">' + (closed ? '🔓 فتح المجموعة' : '🔒 غلق المجموعة') + '</button>' : '') +
+                '</div>' +
+                '<div class="gw-progress"><div class="gw-progress-bar" style="width:' + percent + '%"></div></div>' +
+                '<div class="gw-students">' + studentsHtml + '</div>' +
+            '</div>';
         });
         groupsWindowList.innerHTML = html;
     }
@@ -1516,8 +1645,8 @@
     function showConfirmation(bookingData) {
         confirmationBox.classList.add('active');
         const waNumber = '01227234406';
-        const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${bookingData.studentName}\nالمرحلة: ${bookingData.stage}\nالمجموعة: ${bookingData.group}\nتليفون الطالب: ${bookingData.studentPhone}\nتليفون ولي الأمر: ${bookingData.parentPhone}`;
-        const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+        const msg = 'مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ' + bookingData.studentName + '\nالمرحلة: ' + bookingData.stage + '\nالمجموعة: ' + bookingData.group + '\nتليفون الطالب: ' + bookingData.studentPhone + '\nتليفون ولي الأمر: ' + bookingData.parentPhone;
+        const waLink = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(msg);
         document.getElementById('whatsappShareBtn').href = waLink;
 
         document.getElementById('copyLinkBtn').onclick = function() {
@@ -1534,6 +1663,15 @@
                 alert('تم نسخ الرابط!');
             });
         };
+    }
+
+    function showToast(title, message) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = '<span class="toast-title">' + title + '</span>' + message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 6000);
     }
 
     // ============================================================
@@ -1554,7 +1692,7 @@
         }
 
         if (groups.length === 0) {
-            alert('⚠️ لا توجد مجموعات مسجلة. الرجاء إضافة مجموعة جديدة أولاً.');
+            alert('⚠️ لا توجد مجموعات مسجلة. الرجاء الاتصال بالمدير لإضافة مجموعة.');
             return;
         }
 
@@ -1567,13 +1705,13 @@
 
         const groupObj = groups.find(g => g.name === group);
         if (groupObj && isGroupClosed(groupObj)) {
-            alert(`🔒 عذراً، مجموعة "${group}" مغلقة حالياً ولا يمكن التسجيل فيها.`);
+            alert('🔒 عذراً، مجموعة "' + group + '" مغلقة حالياً ولا يمكن التسجيل فيها.');
             submitBtn.disabled = false;
             submitBtn.textContent = 'تسجيل الحجز';
             return;
         }
         if (groupObj && isGroupFull(groupObj)) {
-            alert(`⚠️ عذراً، مجموعة "${group}" اكتمل عدد المقاعد بها (${groupObj.capacity} طالب) ولا يمكن التسجيل فيها بعد الآن.`);
+            alert('⚠️ عذراً، مجموعة "' + group + '" اكتمل عدد المقاعد بها (' + groupObj.capacity + ' طالب) ولا يمكن التسجيل فيها بعد الآن.');
             submitBtn.disabled = false;
             submitBtn.textContent = 'تسجيل الحجز';
             return;
@@ -1618,7 +1756,7 @@
     // ============================================================
     async function toggleGroupLock(groupName) {
         if (!isAdmin) {
-            alert('⚠️ غلق أو فتح المجموعة خاصية للمشرف فقط. افتح "لوحة التحكم" أولاً بكلمة المرور.');
+            alert('⚠️ غلق أو فتح المجموعة خاصية للمشرف فقط!\nيرجى الضغط على "🔐 دخول المدير" وإدخال كلمة المرور.');
             return;
         }
         await loadData();
@@ -1630,8 +1768,8 @@
         renderGroups();
         renderGroupsWindow();
         alert(g.closed
-            ? `🔒 تم غلق مجموعة "${groupName}". لن يستطيع أي طالب جديد التسجيل فيها حتى تفتحها مرة أخرى.`
-            : `🔓 تم فتح مجموعة "${groupName}" مرة أخرى للتسجيل.`);
+            ? '🔒 تم غلق مجموعة "' + groupName + '". لن يستطيع أي طالب جديد التسجيل فيها حتى تفتحها مرة أخرى.'
+            : '🔓 تم فتح مجموعة "' + groupName + '" مرة أخرى للتسجيل.');
     }
     window.toggleGroupLock = toggleGroupLock;
 
@@ -1639,6 +1777,11 @@
     // ============ AJOUT DE GROUPE ============
     // ============================================================
     async function addGroup() {
+        if (!isAdmin) {
+            alert('⚠️ إضافة مجموعات خاصية للمشرف فقط!\nيرجى الضغط على "🔐 دخول المدير" وإدخال كلمة المرور.');
+            return;
+        }
+
         const val = newGroupInput.value.trim();
         if (!val) { alert('أدخل اسم المجموعة'); return; }
 
@@ -1653,19 +1796,28 @@
         renderGroups();
         newGroupInput.value = '';
         newGroupCapacityInput.value = DEFAULT_CAPACITY;
-        alert(`✅ تم إضافة مجموعة "${val}" بنجاح`);
+        alert('✅ تم إضافة مجموعة "' + val + '" بنجاح');
     }
 
     // ============================================================
     // ============ MODALES ============
     // ============================================================
-    function openAdminPanel() {
+    function toggleAdminMode() {
+        if (isAdmin) {
+            isAdmin = false;
+            updateAdminUI();
+            alert('🔓 تم تسجيل خروج المدير');
+            return;
+        }
+
         const password = prompt('🔐 أدخل كلمة المرور للمشرف:');
         if (password === 'admin123') {
             isAdmin = true;
+            updateAdminUI();
             renderAdminBookings();
             adminModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            alert('✅ تم الدخول كمدير بنجاح');
         } else if (password !== null) {
             alert('❌ كلمة المرور غير صحيحة!');
         }
@@ -1674,7 +1826,6 @@
     function closeAdminPanel() {
         adminModal.classList.remove('active');
         document.body.style.overflow = '';
-        isAdmin = false;
     }
 
     function openGroupsWindow() {
@@ -1764,15 +1915,17 @@
     // ============ INITIALISATION ============
     // ============================================================
     function init() {
-        groups = [];
-        
-        renderGroups();
-        renderBookings();
+        loadData().then(() => {
+            renderGroups();
+            renderBookings();
+            updateAdminUI();
+        });
+
         bookingForm.addEventListener('submit', handleBooking);
         addGroupBtn.addEventListener('click', addGroup);
         newGroupInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addGroup(); } });
 
-        adminPanelBtn.addEventListener('click', openAdminPanel);
+        adminPanelBtn.addEventListener('click', toggleAdminMode);
         modalCloseBtn.addEventListener('click', closeAdminPanel);
         adminModal.addEventListener('click', function(e) {
             if (e.target === this) closeAdminPanel();
@@ -1786,7 +1939,6 @@
             if (e.target === this) closeGroupsWindow();
         });
 
-        // أزرار التصدير والاستيراد
         exportDataBtn.addEventListener('click', exportDataToFile);
         importDataBtn.addEventListener('click', openImportModal);
         importModalCloseBtn.addEventListener('click', closeImportModal);
@@ -1795,8 +1947,7 @@
             if (e.target === this) closeImportModal();
         });
         importFileBtn.addEventListener('click', importDataFromFile);
-        
-        // استيراد بالضغط على Enter في حقل الملف
+
         document.getElementById('fileInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
