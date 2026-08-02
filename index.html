@@ -1050,6 +1050,7 @@
     let isAdmin = false;
     let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
     let lastKnownBookingsCount = 0;
+    let knownBookingKeys = null;
 
     function getBlobUrl() {
         return JSONBLOB_ID ? 'https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID : '';
