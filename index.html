@@ -828,13 +828,13 @@
 
 <script>
     // ================================================================
-    //  🔗 قاعدة البيانات المشتركة - تم التهيئة مسبقاً
+    //  🔗 قاعدة البيانات المشتركة - كود التهيئة
     //  🔑 019fb999-ed4e-7689-bf22-f89a326e0f2c
     // ================================================================
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
     let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
-    const POLL_INTERVAL_MS = 3000; // مزامنة كل 3 ثوانٍ
-    const RETRY_DELAY_MS = 5000; // إعادة المحاولة بعد 5 ثوانٍ في حالة الخطأ
+    const POLL_INTERVAL_MS = 3000;
+    const RETRY_DELAY_MS = 5000;
 
     function getBlobUrl() {
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
@@ -854,7 +854,6 @@
     let lastSyncTime = null;
     let syncErrorCount = 0;
     let syncIntervalId = null;
-    let isFirstLoad = true;
 
     // --------------------- عناصر UI للمزامنة ---------------------
     const syncDot = document.getElementById('syncDot');
@@ -884,7 +883,6 @@
     //  📥 تحميل البيانات من السيرفر
     // ================================================================
     async function loadData() {
-        // تحميل النسخة المحلية كاحتياطي
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
@@ -900,7 +898,7 @@
         try {
             updateSyncStatus('syncing', 'جاري التحميل...');
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // مهلة 10 ثوانٍ
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
             
             const res = await fetch(getBlobUrl(), {
                 headers: { 'Accept': 'application/json' },
@@ -1040,19 +1038,15 @@
         console.log('📡 رابط API:', getBlobUrl());
         updateSyncStatus('syncing', 'جاري الاتصال...');
 
-        // تنفيذ التحميل الأولي
         refreshFromServer().then((success) => {
             if (success) {
                 console.log('✅ تم التحميل الأولي بنجاح');
-                isFirstLoad = false;
             } else {
                 console.warn('⚠️ فشل التحميل الأولي، سيتم إعادة المحاولة...');
-                // محاولة إعادة التحميل بعد تأخير
                 setTimeout(() => refreshFromServer(), RETRY_DELAY_MS);
             }
         });
 
-        // إعداد المزامنة الدورية - تستمر حتى لو انقطعت الإنترنت
         if (syncIntervalId) clearInterval(syncIntervalId);
         syncIntervalId = setInterval(async () => {
             try {
@@ -1065,7 +1059,6 @@
         console.log('✅ المزامنة المستمرة تعمل كل', POLL_INTERVAL_MS / 1000, 'ثواني');
     }
 
-    // إعادة تشغيل المزامنة في حالة فقدان الاتصال
     function restartSyncIfNeeded() {
         if (!syncIntervalId) {
             console.log('🔄 إعادة تشغيل المزامنة...');
@@ -1073,7 +1066,6 @@
         }
     }
 
-    // مراقبة حالة الاتصال بالإنترنت
     window.addEventListener('online', function() {
         console.log('🌐 الاتصال بالإنترنت عاد');
         updateSyncStatus('syncing', 'إعادة الاتصال...');
