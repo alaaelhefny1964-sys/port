@@ -415,10 +415,10 @@
             background: linear-gradient(135deg, #fffdf9, #fcf6ec);
             border-radius: 18px;
             padding: 12px 18px;
-            margin-bottom: 10px;
-            border: 1.5px solid #ecdff3;
-            border-right: 6px solid #9B5DE5;
-            box-shadow: 0 3px 10px rgba(155,93,229,0.08);
+            margin-bottom: 14px;
+            border: 2px solid #c9a2e0;
+            border-right: 8px solid #7B2FBE;
+            box-shadow: 0 4px 12px rgba(123,47,190,0.15);
             transition: 0.2s;
         }
         .booking-card:hover { background: linear-gradient(135deg, #fdf9f2, #f9f0e4); box-shadow: 0 5px 14px rgba(155,93,229,0.14); }
@@ -439,7 +439,9 @@
             margin-top: 5px;
         }
         .booking-card .details span {
-            background: #ede5f0;
+            background: #e4d3ee;
+            color: #3d1a52;
+            font-weight: 700;
             padding: 2px 12px;
             border-radius: 30px;
             line-height: 1.5;
@@ -568,12 +570,13 @@
             transform: scale(1.1);
         }
         .modal-booking-card {
-            background: #fcf8f2;
+            background: linear-gradient(135deg, #fffdf9, #fcf6ec);
             border-radius: 16px;
             padding: 14px 18px;
             margin-bottom: 12px;
-            border-right: 5px solid #9B5DE5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 2px solid #c9a2e0;
+            border-right: 7px solid #7B2FBE;
+            box-shadow: 0 3px 10px rgba(123,47,190,0.12);
         }
         .modal-booking-card .m-name {
             font-weight: 800;
@@ -589,7 +592,9 @@
             gap: 4px 16px;
         }
         .modal-booking-card .m-details span {
-            background: #ede5f0;
+            background: #e4d3ee;
+            color: #3d1a52;
+            font-weight: 700;
             padding: 0 10px;
             border-radius: 20px;
             line-height: 1.7;
@@ -1533,6 +1538,10 @@
             alert('⚠️ رقم تليفون ولي الأمر غير صحيح: يجب أن يبدأ بـ 0 ويتكون من 11 رقم بالضبط.');
             return;
         }
+        if (studentPhone === parentPhone) {
+            alert('⚠️ رقم تليفون الطالب ورقم تليفون ولي الأمر لا يمكن أن يكونا متطابقين، يجب إدخال رقمين مختلفين.');
+            return;
+        }
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'جارٍ التسجيل...';
@@ -1551,14 +1560,13 @@
                 return;
             }
 
-            const exists = bookings.some(b => b.studentName === studentName && b.group === group);
+            const exists = bookings.some(b => b.studentName.trim() === studentName.trim());
             if (exists) {
-                if (!confirm('يوجد حجز سابق بنفس الاسم والمجموعة. هل تريد التسجيل مرة أخرى؟')) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'تسجيل الحجز';
-                    showSaveStatus('error', '❌ تم الإلغاء');
-                    return;
-                }
+                alert('⚠️ سبق التسجيل بهذا الاسم من قبل. لا يمكن تسجيل نفس الطالب مرتين.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'تسجيل الحجز';
+                showSaveStatus('error', '❌ الاسم مسجل مسبقاً');
+                return;
             }
 
             const newBooking = {
