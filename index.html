@@ -830,6 +830,7 @@
     // ================================================================
     //  🔗 قاعدة البيانات المشتركة - سيتم إنشاؤها تلقائياً
     //  🔑 سيتم إنشاء كود جديد عند أول حفظ
+    //  ⚠️ الكود القديم 019fb999-ed4e-7689-bf22-f89a326e0f2c غير موجود
     // ================================================================
     let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 3000;
@@ -915,7 +916,6 @@
     //  📥 تحميل البيانات من السيرفر
     // ================================================================
     async function loadData() {
-        // تحميل النسخة المحلية كاحتياطي
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
@@ -923,13 +923,11 @@
             if (Array.isArray(lb) && lb.length) bookings = lb;
         } catch (e) {}
 
-        // إذا لم توجد بيانات محلية، استخدم البيانات الأولية
         if (groups.length === 0) groups = defaultGroups;
         if (bookings.length === 0) bookings = initialBookings;
 
         if (!JSONBLOB_ID) {
             updateSyncStatus('offline', 'لا يوجد كود - سيتم إنشاؤه عند الحفظ');
-            // عرض البيانات المحلية
             renderGroups();
             renderBookings();
             return false;
@@ -947,9 +945,8 @@
             clearTimeout(timeoutId);
             
             if (res.status === 404) {
-                // القاعدة غير موجودة - سنقوم بإنشائها
                 updateSyncStatus('creating', 'قاعدة البيانات غير موجودة، جاري إنشاؤها...');
-                await saveData(); // سيتم إنشاء قاعدة جديدة
+                await saveData();
                 return true;
             }
             
@@ -994,7 +991,7 @@
     }
 
     // ================================================================
-    //  📤 حفظ البيانات على السيرفر (مع إنشاء قاعدة جديدة إذا لزم الأمر)
+    //  📤 حفظ البيانات على السيرفر
     // ================================================================
     async function saveData() {
         if (isSaving) return;
@@ -1003,7 +1000,6 @@
         localStorage.setItem('bookingGroups', JSON.stringify(groups));
         localStorage.setItem('bookingList', JSON.stringify(bookings));
 
-        // إذا لم يوجد كود، أنشئ قاعدة بيانات جديدة
         if (!JSONBLOB_ID) {
             try {
                 updateSyncStatus('creating', 'جاري إنشاء قاعدة بيانات جديدة...');
@@ -1088,7 +1084,6 @@
             if (adminModal.classList.contains('active')) renderAdminBookings();
             if (groupsModal.classList.contains('active')) renderGroupsWindow();
         } else {
-            // إذا فشل التحميل، استخدم البيانات المحلية
             renderGroups();
             renderBookings();
         }
@@ -1100,7 +1095,6 @@
         console.log('🔄 بدء المزامنة المستمرة...');
         if (JSONBLOB_ID) {
             console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-            console.log('📡 رابط API:', getBlobUrl());
         } else {
             console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة عند أول حفظ');
         }
@@ -1177,7 +1171,6 @@
     function showSetupResult(id) {
         setupResultBox.style.display = 'block';
         setupResultInput.value = id;
-        // تنبيه المستخدم
         alert('✅ تم إنشاء قاعدة بيانات جديدة!\nالكود: ' + id + '\n\nيرجى نسخ الكود وإرساله في الشات.');
     }
 
@@ -1573,14 +1566,11 @@
             if (e.key === 'Escape') { closeAdminPanel(); closeGroupsWindow(); }
         });
 
-        // 🔄 بدء المزامنة المستمرة
         startSync();
         
         console.log('✅ النظام جاهز ويعمل');
-        console.log('📌 مؤشر المزامنة في أسفل الصفحة يظهر حالة الاتصال');
     }
 
-    // تشغيل التطبيق
     init();
 </script>
 
