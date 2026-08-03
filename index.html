@@ -683,6 +683,34 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        .save-status {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        .save-status.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .save-status.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .save-status.saving {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
         @media (max-width: 600px) {
             .notebook { padding: 20px 15px; }
             .notebook-header h1 { font-size: 1.9rem; }
@@ -749,7 +777,8 @@
             </select>
         </div>
 
-        <button type="submit" class="btn-primary">تسجيل الحجز</button>
+        <button type="submit" class="btn-primary" id="submitBtn">تسجيل الحجز</button>
+        <div id="saveStatus" class="save-status"></div>
     </form>
 
     <div id="confirmationBox" class="confirmation-box">
@@ -833,8 +862,7 @@
 
 <script>
     // ================================================================
-    //  🔗 قاعدة البيانات المشتركة
-    //  🔑 سيتم إنشاء كود جديد عند أول حفظ
+    //  🔗 قاعدة البيانات المشتركة - سيتم إنشاؤها تلقائياً
     // ================================================================
     let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 3000;
@@ -844,72 +872,32 @@
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
 
-    // ================================================================
-    //  📋 الحجوزات الموحدة من الصورتين
-    // ================================================================
+    // --------------------- البيانات ---------------------
     let groups = [];
     let bookings = [];
     const DEFAULT_CAPACITY = 30;
     const defaultGroups = [
         { name: 'مجموعة السبت 4 عصر', capacity: DEFAULT_CAPACITY, locked: false },
         { name: 'مجموعة الأحد 6 مساء', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الخميس 1.30', capacity: DEFAULT_CAPACITY, locked: false }
+        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
     ];
 
-    // ================================================================
-    //  📋 جميع الحجوزات من الصورتين - موحدة
-    // ================================================================
     const initialBookings = [
-        // من الصورة الأولى (جهاز 1)
         {
             stage: 'ثانوي',
-            studentName: 'سجدة محمد احمد',
-            studentPhone: '01092378954',
-            parentPhone: '01208123567',
-            group: 'مجموعة السبت 4 عصر',
-            timestamp: '3:00:44 م, 2024/8/3'
-        },
-        {
-            stage: 'ثانوي',
-            studentName: 'سامر البيد عامر',
-            studentPhone: '1234567908',
-            parentPhone: '013456678899',
-            group: 'مجموعة الخميس 1.30',
-            timestamp: '1:00:44 م, 2024/8/3'
-        },
-        {
-            stage: 'ثانوي',
-            studentName: 'علاء على محمد الحفني',
-            studentPhone: '1937646464646',
-            parentPhone: '01227234406',
-            group: 'مجموعة السبت 4 عصر',
-            timestamp: '3:00:44 م, 2024/8/3'
-        },
-        // من الصورة الثانية (جهاز 2)
-        {
-            stage: 'ثانوي',
-            studentName: 'شاعر ثابت ابراهيم',
-            studentPhone: '01209343214',
-            parentPhone: '01238976450',
-            group: 'مجموعة السبت 4 عصر',
-            timestamp: '3:21:45 م, 2024/8/3'
-        },
-        {
-            stage: 'ثانوي',
-            studentName: 'خالد ابراهيم خالد محمود',
+            studentName: 'خالد إبراهيم خالد محمود',
             studentPhone: '01176345234',
             parentPhone: '01227234406',
             group: 'مجموعة السبت 4 عصر',
-            timestamp: '1:40:53 م, 2024/8/3'
+            timestamp: '١٢:٥٣ م ٢٠٢٤/٨/٣'
         },
         {
             stage: 'ثانوي',
-            studentName: 'حامد سعيد ابراهيم محمد',
+            studentName: 'حامد سعيد إبراهيم محمد',
             studentPhone: '01238976450',
             parentPhone: '01238976450',
             group: 'مجموعة السبت 4 عصر',
-            timestamp: '3:21:45 م, 2024/8/3'
+            timestamp: '١١:٥١ م ٢٠٢٤/٨/٣'
         }
     ];
 
@@ -919,13 +907,15 @@
     let syncIntervalId = null;
     let deviceId = Math.random().toString(36).substring(2, 8);
 
-    // --------------------- عناصر UI للمزامنة ---------------------
+    // عناصر UI
     const syncDot = document.getElementById('syncDot');
     const syncText = document.getElementById('syncText');
     const syncTime = document.getElementById('syncTime');
     const syncCount = document.getElementById('syncCount');
     const syncDevice = document.getElementById('syncDevice');
     const lastUpdate = document.getElementById('lastUpdate');
+    const saveStatus = document.getElementById('saveStatus');
+    const submitBtn = document.getElementById('submitBtn');
 
     function updateSyncStatus(status, message) {
         if (status === 'connected') {
@@ -948,6 +938,17 @@
         syncCount.textContent = bookings.length + ' حجوزات';
         syncDevice.textContent = 'جهاز: ' + deviceId;
         if (lastUpdate) lastUpdate.textContent = message || '--';
+    }
+
+    function showSaveStatus(type, message) {
+        saveStatus.className = 'save-status ' + type;
+        saveStatus.textContent = message;
+        saveStatus.style.display = 'block';
+        if (type !== 'saving') {
+            setTimeout(() => {
+                saveStatus.style.display = 'none';
+            }, 5000);
+        }
     }
 
     // ================================================================
@@ -1022,74 +1023,108 @@
     }
 
     // ================================================================
-    //  📤 حفظ البيانات على السيرفر
+    //  📤 حفظ البيانات على السيرفر - الإصلاح الأساسي
     // ================================================================
-    async function saveData() {
-        if (isSaving) return;
+    async function saveData(showStatusMessage = true) {
+        if (isSaving) {
+            console.log('⚠️ عملية حفظ قيد التنفيذ بالفعل');
+            return;
+        }
         isSaving = true;
 
-        if (!JSONBLOB_ID) {
-            try {
-                updateSyncStatus('creating', 'جاري إنشاء قاعدة بيانات جديدة...');
-                const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ groups, bookings })
-                });
-                if (res.ok) {
-                    const loc = res.headers.get('Location') || res.headers.get('location') || '';
-                    const id = loc.split('/').pop();
-                    if (id) {
-                        JSONBLOB_ID = id;
-                        localStorage.setItem('bookingBlobId', id);
-                        showSetupResult(id);
-                        console.log('✅ تم إنشاء قاعدة بيانات جديدة بالكود:', id);
-                    }
-                } else {
-                    throw new Error('فشل إنشاء القاعدة: ' + res.status);
-                }
-            } catch (e) {
-                console.error('إنشاء Blob فشل:', e);
-                updateSyncStatus('error', 'فشل إنشاء القاعدة: ' + e.message);
-                isSaving = false;
-                return;
-            }
-        }
-
-        if (!JSONBLOB_ID) {
-            isSaving = false;
-            return;
+        if (showStatusMessage) {
+            showSaveStatus('saving', '⏳ جاري حفظ البيانات على السيرفر...');
         }
 
         try {
-            updateSyncStatus('syncing', 'جاري الحفظ...');
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
-            
-            const res = await fetch(getBlobUrl(), {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ groups, bookings }),
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-            
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            
-            lastSyncTime = new Date();
-            syncErrorCount = 0;
-            const timeStr = lastSyncTime.toLocaleTimeString('ar-EG');
-            updateSyncStatus('connected', 'تم الحفظ: ' + timeStr);
-            syncCount.textContent = bookings.length + ' حجوزات';
-            
-            console.log('✅ تم حفظ ' + bookings.length + ' حجوزات على السيرفر');
+            // حفظ محلياً أولاً
+            localStorage.setItem('bookingGroups', JSON.stringify(groups));
+            localStorage.setItem('bookingList', JSON.stringify(bookings));
+
+            // إذا لم يوجد كود، أنشئ قاعدة بيانات جديدة
+            if (!JSONBLOB_ID) {
+                try {
+                    updateSyncStatus('creating', 'جاري إنشاء قاعدة بيانات جديدة...');
+                    const res = await fetch('https://jsonblob.com/api/jsonBlob', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ groups, bookings })
+                    });
+                    if (res.ok) {
+                        const loc = res.headers.get('Location') || res.headers.get('location') || '';
+                        const id = loc.split('/').pop();
+                        if (id) {
+                            JSONBLOB_ID = id;
+                            localStorage.setItem('bookingBlobId', id);
+                            showSetupResult(id);
+                            console.log('✅ تم إنشاء قاعدة بيانات جديدة بالكود:', id);
+                            if (showStatusMessage) {
+                                showSaveStatus('success', '✅ تم إنشاء قاعدة بيانات جديدة! الكود: ' + id);
+                            }
+                        }
+                    } else {
+                        throw new Error('فشل إنشاء القاعدة: ' + res.status);
+                    }
+                } catch (e) {
+                    console.error('إنشاء Blob فشل:', e);
+                    if (showStatusMessage) {
+                        showSaveStatus('error', '❌ فشل إنشاء القاعدة: ' + e.message);
+                    }
+                    isSaving = false;
+                    return;
+                }
+            }
+
+            if (!JSONBLOB_ID) {
+                isSaving = false;
+                return;
+            }
+
+            // حفظ على السيرفر - PUT
+            try {
+                updateSyncStatus('syncing', 'جاري الحفظ على السيرفر...');
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                
+                const res = await fetch(getBlobUrl(), {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ groups, bookings }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    throw new Error('HTTP ' + res.status + ': ' + errorText);
+                }
+                
+                lastSyncTime = new Date();
+                syncErrorCount = 0;
+                const timeStr = lastSyncTime.toLocaleTimeString('ar-EG');
+                updateSyncStatus('connected', 'تم الحفظ: ' + timeStr);
+                syncCount.textContent = bookings.length + ' حجوزات';
+                
+                console.log('✅ تم حفظ ' + bookings.length + ' حجوزات على السيرفر');
+                if (showStatusMessage) {
+                    showSaveStatus('success', '✅ تم حفظ البيانات على السيرفر (' + bookings.length + ' حجوزات)');
+                }
+            } catch (err) {
+                console.error('تعذر حفظ البيانات:', err);
+                syncErrorCount++;
+                if (showStatusMessage) {
+                    showSaveStatus('error', '❌ فشل الحفظ: ' + err.message);
+                }
+                updateSyncStatus('error', 'فشل الحفظ: ' + err.message);
+            }
         } catch (err) {
-            console.error('تعذر حفظ البيانات:', err);
-            syncErrorCount++;
-            updateSyncStatus('error', 'خطأ في الحفظ: ' + err.message);
+            console.error('خطأ عام في الحفظ:', err);
+            if (showStatusMessage) {
+                showSaveStatus('error', '❌ خطأ: ' + err.message);
+            }
         }
         isSaving = false;
     }
@@ -1110,15 +1145,18 @@
 
     async function forceSync() {
         updateSyncStatus('syncing', 'مزامنة فورية...');
+        showSaveStatus('saving', '⏳ جاري المزامنة...');
         await refreshFromServer();
+        showSaveStatus('success', '✅ تمت المزامنة بنجاح');
         updateSyncStatus('connected', 'تمت المزامنة: ' + new Date().toLocaleTimeString('ar-EG'));
     }
 
-    // مسح البيانات المحلية
     function clearLocalData() {
         if (confirm('⚠️ هل أنت متأكد من مسح البيانات المحلية؟ سيتم تحميل البيانات من السيرفر عند التحديث.')) {
             localStorage.removeItem('bookingGroups');
             localStorage.removeItem('bookingList');
+            localStorage.removeItem('bookingBlobId');
+            JSONBLOB_ID = '';
             alert('✅ تم مسح البيانات المحلية');
             refreshFromServer();
         }
@@ -1129,6 +1167,7 @@
         console.log('🆔 معرف هذا الجهاز:', deviceId);
         if (JSONBLOB_ID) {
             console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
+            console.log('📡 رابط API:', getBlobUrl());
         } else {
             console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة عند أول حفظ');
         }
@@ -1166,7 +1205,7 @@
     });
 
     // ================================================================
-    //  دوال العرض والتطبيق
+    //  دوال العرض
     // ================================================================
     function getGroupCount(groupName) {
         return bookings.filter(b => b.group === groupName).length;
@@ -1177,7 +1216,6 @@
         return getGroupCount(groupObj.name) >= groupObj.capacity;
     }
 
-    // عناصر الصفحة
     const groupSelect = document.getElementById('groupSelect');
     const groupTagsContainer = document.getElementById('groupTagsContainer');
     const newGroupInput = document.getElementById('newGroupInput');
@@ -1209,7 +1247,6 @@
     function showSetupResult(id) {
         setupResultBox.style.display = 'block';
         setupResultInput.value = id;
-        alert('✅ تم إنشاء قاعدة بيانات جديدة!\nالكود: ' + id + '\n\nيرجى نسخ الكود وإرساله في الشات.');
     }
 
     function renderGroups() {
@@ -1416,7 +1453,9 @@
         groupsWindowList.innerHTML = html;
     }
 
-    // --------------------- تسجيل حجز جديد ---------------------
+    // ================================================================
+    //  📝 تسجيل حجز جديد - الإصلاح الأساسي
+    // ================================================================
     async function handleBooking(e) {
         e.preventDefault();
 
@@ -1431,56 +1470,73 @@
             return;
         }
 
-        const submitBtn = bookingForm.querySelector('.btn-primary');
         submitBtn.disabled = true;
         submitBtn.textContent = 'جارٍ التسجيل...';
+        showSaveStatus('saving', '⏳ جاري تسجيل الحجز...');
 
-        await refreshFromServer();
+        try {
+            // 1. تحميل آخر البيانات من السيرفر
+            await refreshFromServer();
 
-        const groupObj = groups.find(g => g.name === group);
-        if (groupObj && isGroupFull(groupObj)) {
-            alert(`⚠️ عذراً، مجموعة "${group}" غير متاحة للتسجيل (مقفولة أو مكتملة).`);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'تسجيل الحجز';
-            return;
-        }
-
-        const exists = bookings.some(b => b.studentName === studentName && b.group === group);
-        if (exists) {
-            if (!confirm('يوجد حجز سابق بنفس الاسم والمجموعة. هل تريد التسجيل مرة أخرى؟')) {
+            const groupObj = groups.find(g => g.name === group);
+            if (groupObj && isGroupFull(groupObj)) {
+                alert(`⚠️ عذراً، مجموعة "${group}" غير متاحة للتسجيل (مقفولة أو مكتملة).`);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'تسجيل الحجز';
+                showSaveStatus('error', '❌ المجموعة مكتملة أو مقفولة');
                 return;
             }
+
+            const exists = bookings.some(b => b.studentName === studentName && b.group === group);
+            if (exists) {
+                if (!confirm('يوجد حجز سابق بنفس الاسم والمجموعة. هل تريد التسجيل مرة أخرى؟')) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'تسجيل الحجز';
+                    showSaveStatus('error', '❌ تم الإلغاء');
+                    return;
+                }
+            }
+
+            const newBooking = {
+                stage,
+                studentName,
+                studentPhone,
+                parentPhone,
+                group,
+                timestamp: new Date().toLocaleString('ar-EG', { hour12: true })
+            };
+
+            // 2. إضافة الحجز
+            bookings.push(newBooking);
+            
+            // 3. حفظ على السيرفر - هذه هي الخطوة المهمة!
+            await saveData(true);
+            
+            // 4. تحديث العرض
+            renderBookings();
+
+            // 5. إظهار التأكيد
+            confirmationBox.classList.add('active');
+            const waNumber = '01227234406';
+            const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${studentName}\nالمرحلة: ${stage}\nالمجموعة: ${group}\nتليفون الطالب: ${studentPhone}\nتليفون ولي الأمر: ${parentPhone}`;
+            document.getElementById('whatsappShareBtn').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+            document.getElementById('copyLinkBtn').onclick = function() {
+                navigator.clipboard.writeText(window.location.href).then(() => alert('تم نسخ الرابط!'))
+                    .catch(() => { const ta = document.createElement('textarea'); ta.value = window.location.href; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('تم نسخ الرابط!'); });
+            };
+
+            document.getElementById('stage').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentPhone').value = '';
+            document.getElementById('parentPhone').value = '';
+            groupSelect.value = '';
+
+            showSaveStatus('success', '✅ تم تسجيل الحجز وحفظه على السيرفر');
+
+        } catch (err) {
+            console.error('خطأ في التسجيل:', err);
+            showSaveStatus('error', '❌ فشل التسجيل: ' + err.message);
         }
-
-        const newBooking = {
-            stage,
-            studentName,
-            studentPhone,
-            parentPhone,
-            group,
-            timestamp: new Date().toLocaleString('ar-EG', { hour12: true })
-        };
-
-        bookings.push(newBooking);
-        await saveData();
-        renderBookings();
-
-        confirmationBox.classList.add('active');
-        const waNumber = '01227234406';
-        const msg = `مرحباً إدارة الحجوزات،\nتم تسجيل حجز جديد:\nالطالب: ${studentName}\nالمرحلة: ${stage}\nالمجموعة: ${group}\nتليفون الطالب: ${studentPhone}\nتليفون ولي الأمر: ${parentPhone}`;
-        document.getElementById('whatsappShareBtn').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-        document.getElementById('copyLinkBtn').onclick = function() {
-            navigator.clipboard.writeText(window.location.href).then(() => alert('تم نسخ الرابط!'))
-                .catch(() => { const ta = document.createElement('textarea'); ta.value = window.location.href; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('تم نسخ الرابط!'); });
-        };
-
-        document.getElementById('stage').value = '';
-        document.getElementById('studentName').value = '';
-        document.getElementById('studentPhone').value = '';
-        document.getElementById('parentPhone').value = '';
-        groupSelect.value = '';
 
         submitBtn.disabled = false;
         submitBtn.textContent = 'تسجيل الحجز';
@@ -1504,7 +1560,7 @@
         newGroupCapacityInput.value = DEFAULT_CAPACITY;
     }
 
-    // --------------------- دوال النوافذ المنبثقة ---------------------
+    // --------------------- دوال النوافذ ---------------------
     function openAdminPanel() {
         const password = prompt('🔐 أدخل كلمة المرور للمشرف:');
         if (password === 'admin123') {
@@ -1553,12 +1609,11 @@
     }
 
     // ================================================================
-    //  🚀 التهيئة والتشغيل
+    //  🚀 التهيئة
     // ================================================================
     function init() {
         console.log('🚀 بدء تشغيل دفتر الحجوزات...');
         console.log('🆔 معرف الجهاز:', deviceId);
-        console.log('📋 عدد الحجوزات المحملة:', initialBookings.length);
         
         renderGroups();
         renderBookings();
@@ -1582,6 +1637,7 @@
         setupDbBtn.addEventListener('click', async function() {
             if (JSONBLOB_ID) { 
                 showSetupResult(JSONBLOB_ID); 
+                alert('✅ قاعدة البيانات مفعلة بالكود: ' + JSONBLOB_ID);
                 return; 
             }
             await saveData();
