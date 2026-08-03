@@ -799,6 +799,7 @@
             <button class="modal-export-btn" id="exportBtn">📥 تنزيل البيانات (Excel + نص)</button>
             <button class="modal-export-btn" id="setupDbBtn" style="background:linear-gradient(135deg,#9B5DE5,#EF476F); margin-inline-start:8px;">🔧 تهيئة قاعدة البيانات المشتركة</button>
             <button class="modal-export-btn" id="forceSyncBtn" style="background:linear-gradient(135deg,#FFD166,#f39c12); margin-inline-start:8px;">🔄 مزامنة فورية</button>
+            <button class="modal-export-btn" id="clearLocalBtn" style="background:linear-gradient(135deg,#EF476F,#b0003a); margin-inline-start:8px;">🗑️ مسح البيانات المحلية</button>
         </div>
         <div id="setupResultBox" style="display:none; margin-top:14px; background:#fff9e6; border:2px solid #FFD166; border-radius:16px; padding:14px 16px; text-align:center;">
             <div style="font-size:0.85rem; font-weight:700; color:#5f2d8a; margin-bottom:8px;">كود قاعدة البيانات - انسخه وابعته في الشات:</div>
@@ -833,7 +834,7 @@
 <script>
     // ================================================================
     //  🔗 قاعدة البيانات المشتركة
-    //  🔑 استخدم الكود الذي ظهر لديك
+    //  🔑 سيتم إنشاء كود جديد عند أول حفظ
     // ================================================================
     let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 3000;
@@ -843,40 +844,72 @@
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
 
-    // --------------------- بيانات التطبيق ---------------------
+    // ================================================================
+    //  📋 الحجوزات الموحدة من الصورتين
+    // ================================================================
     let groups = [];
     let bookings = [];
     const DEFAULT_CAPACITY = 30;
     const defaultGroups = [
         { name: 'مجموعة السبت 4 عصر', capacity: DEFAULT_CAPACITY, locked: false },
         { name: 'مجموعة الأحد 6 مساء', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
+        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false },
+        { name: 'مجموعة الخميس 1.30', capacity: DEFAULT_CAPACITY, locked: false }
     ];
 
+    // ================================================================
+    //  📋 جميع الحجوزات من الصورتين - موحدة
+    // ================================================================
     const initialBookings = [
+        // من الصورة الأولى (جهاز 1)
         {
             stage: 'ثانوي',
-            studentName: 'خالد إبراهيم خالد محمود',
-            studentPhone: '01227234406',
-            parentPhone: '01176345234',
+            studentName: 'سجدة محمد احمد',
+            studentPhone: '01092378954',
+            parentPhone: '01208123567',
             group: 'مجموعة السبت 4 عصر',
-            timestamp: '١٢:٥٣ م ٢٠٢٨/٨/٣'
+            timestamp: '3:00:44 م, 2024/8/3'
         },
         {
             stage: 'ثانوي',
-            studentName: 'حامد سعيد إبراهيم محمد',
-            studentPhone: '01227234406',
-            parentPhone: '012453764849',
-            group: 'مجموعة السبت 4 عصر',
-            timestamp: '١١:٥١ م ٢٠٢٨/٨/٣'
+            studentName: 'سامر البيد عامر',
+            studentPhone: '1234567908',
+            parentPhone: '013456678899',
+            group: 'مجموعة الخميس 1.30',
+            timestamp: '1:00:44 م, 2024/8/3'
         },
         {
             stage: 'ثانوي',
-            studentName: 'جمال محمد جمال',
-            studentPhone: '01096698116',
-            parentPhone: '01206612721',
-            group: 'مجموعة الأحد 6 مساء',
-            timestamp: '١٢:٥٣ م ٢٠٢٨/٨/٣'
+            studentName: 'علاء على محمد الحفني',
+            studentPhone: '1937646464646',
+            parentPhone: '01227234406',
+            group: 'مجموعة السبت 4 عصر',
+            timestamp: '3:00:44 م, 2024/8/3'
+        },
+        // من الصورة الثانية (جهاز 2)
+        {
+            stage: 'ثانوي',
+            studentName: 'شاعر ثابت ابراهيم',
+            studentPhone: '01209343214',
+            parentPhone: '01238976450',
+            group: 'مجموعة السبت 4 عصر',
+            timestamp: '3:21:45 م, 2024/8/3'
+        },
+        {
+            stage: 'ثانوي',
+            studentName: 'خالد ابراهيم خالد محمود',
+            studentPhone: '01176345234',
+            parentPhone: '01227234406',
+            group: 'مجموعة السبت 4 عصر',
+            timestamp: '1:40:53 م, 2024/8/3'
+        },
+        {
+            stage: 'ثانوي',
+            studentName: 'حامد سعيد ابراهيم محمد',
+            studentPhone: '01238976450',
+            parentPhone: '01238976450',
+            group: 'مجموعة السبت 4 عصر',
+            timestamp: '3:21:45 م, 2024/8/3'
         }
     ];
 
@@ -918,7 +951,7 @@
     }
 
     // ================================================================
-    //  📥 تحميل البيانات من السيرفر - الأهم: إجبار التحديث
+    //  📥 تحميل البيانات من السيرفر
     // ================================================================
     async function loadData() {
         if (!JSONBLOB_ID) {
@@ -934,7 +967,7 @@
             const res = await fetch(getBlobUrl(), {
                 headers: { 'Accept': 'application/json' },
                 signal: controller.signal,
-                cache: 'no-cache' // منع التخزين المؤقت
+                cache: 'no-cache'
             });
             clearTimeout(timeoutId);
             
@@ -948,14 +981,13 @@
             
             const data = await res.json();
             
-            // تحديث البيانات من السيرفر - تجاهل localStorage
-            if (data.groups && Array.isArray(data.groups)) {
+            if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
                 groups = data.groups;
             } else {
                 groups = defaultGroups;
             }
             
-            if (data.bookings && Array.isArray(data.bookings)) {
+            if (data.bookings && Array.isArray(data.bookings) && data.bookings.length > 0) {
                 bookings = data.bookings;
             } else {
                 bookings = initialBookings;
@@ -964,7 +996,6 @@
             
             groups = groups.map(g => ({ ...g, locked: g.locked || false }));
             
-            // حفظ نسخة محلية فقط كاحتياطي
             try {
                 localStorage.setItem('bookingGroups', JSON.stringify(groups));
                 localStorage.setItem('bookingList', JSON.stringify(bookings));
@@ -976,7 +1007,6 @@
             updateSyncStatus('connected', 'آخر تحديث: ' + timeStr);
             syncCount.textContent = bookings.length + ' حجوزات';
             
-            // تحديث الواجهة
             renderGroups();
             renderBookings();
             if (adminModal.classList.contains('active')) renderAdminBookings();
@@ -986,11 +1016,7 @@
         } catch (err) {
             console.error('تعذر تحميل البيانات:', err);
             syncErrorCount++;
-            if (err.name === 'AbortError') {
-                updateSyncStatus('error', 'انتهت المهلة - إعادة محاولة...');
-            } else {
-                updateSyncStatus('error', 'خطأ: ' + err.message);
-            }
+            updateSyncStatus('error', 'خطأ: ' + err.message);
             return false;
         }
     }
@@ -1063,11 +1089,7 @@
         } catch (err) {
             console.error('تعذر حفظ البيانات:', err);
             syncErrorCount++;
-            if (err.name === 'AbortError') {
-                updateSyncStatus('error', 'انتهت المهلة في الحفظ');
-            } else {
-                updateSyncStatus('error', 'خطأ في الحفظ: ' + err.message);
-            }
+            updateSyncStatus('error', 'خطأ في الحفظ: ' + err.message);
         }
         isSaving = false;
     }
@@ -1082,16 +1104,24 @@
         isRefreshing = true;
         
         const success = await loadData();
-        // التحديث يحدث داخل loadData()
         isRefreshing = false;
         return success;
     }
 
-    // دالة مزامنة فورية (للزر)
     async function forceSync() {
         updateSyncStatus('syncing', 'مزامنة فورية...');
         await refreshFromServer();
         updateSyncStatus('connected', 'تمت المزامنة: ' + new Date().toLocaleTimeString('ar-EG'));
+    }
+
+    // مسح البيانات المحلية
+    function clearLocalData() {
+        if (confirm('⚠️ هل أنت متأكد من مسح البيانات المحلية؟ سيتم تحميل البيانات من السيرفر عند التحديث.')) {
+            localStorage.removeItem('bookingGroups');
+            localStorage.removeItem('bookingList');
+            alert('✅ تم مسح البيانات المحلية');
+            refreshFromServer();
+        }
     }
 
     function startSync() {
@@ -1099,7 +1129,6 @@
         console.log('🆔 معرف هذا الجهاز:', deviceId);
         if (JSONBLOB_ID) {
             console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-            console.log('📡 رابط API:', getBlobUrl());
         } else {
             console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة عند أول حفظ');
         }
@@ -1170,6 +1199,7 @@
     const setupResultInput = document.getElementById('setupResultInput');
     const setupCopyBtn = document.getElementById('setupCopyBtn');
     const forceSyncBtn = document.getElementById('forceSyncBtn');
+    const clearLocalBtn = document.getElementById('clearLocalBtn');
 
     const groupsWindowBtn = document.getElementById('groupsWindowBtn');
     const groupsModal = document.getElementById('groupsModal');
@@ -1405,7 +1435,6 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'جارٍ التسجيل...';
 
-        // تحميل آخر البيانات قبل التسجيل
         await refreshFromServer();
 
         const groupObj = groups.find(g => g.name === group);
@@ -1529,12 +1558,7 @@
     function init() {
         console.log('🚀 بدء تشغيل دفتر الحجوزات...');
         console.log('🆔 معرف الجهاز:', deviceId);
-        if (JSONBLOB_ID) {
-            console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-        } else {
-            console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة تلقائياً');
-        }
-        console.log('⏱️  فترة المزامنة:', POLL_INTERVAL_MS / 1000, 'ثواني');
+        console.log('📋 عدد الحجوزات المحملة:', initialBookings.length);
         
         renderGroups();
         renderBookings();
@@ -1549,6 +1573,10 @@
         
         forceSyncBtn.addEventListener('click', async function() {
             await forceSync();
+        });
+        
+        clearLocalBtn.addEventListener('click', function() {
+            clearLocalData();
         });
         
         setupDbBtn.addEventListener('click', async function() {
