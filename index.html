@@ -823,12 +823,12 @@
     <span class="sync-label">|</span>
     <span class="sync-time" id="syncTime">جاري التحديث...</span>
     <span class="sync-label">|</span>
-    <span class="sync-time" id="syncCount">0 حجوزات</span>
+    <span class="sync-time" id="syncCount">4 حجوزات</span>
 </div>
 
 <script>
     // ================================================================
-    //  🔗 قاعدة البيانات المشتركة - كود التهيئة
+    //  🔗 قاعدة البيانات المشتركة - تم التهيئة مسبقاً
     //  🔑 019fb999-ed4e-7689-bf22-f89a326e0f2c
     // ================================================================
     const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
@@ -840,7 +840,7 @@
         return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
     }
 
-    // --------------------- بيانات التطبيق ---------------------
+    // --------------------- البيانات الأولية مع الحجوزات الأربعة ---------------------
     let groups = [];
     let bookings = [];
     const DEFAULT_CAPACITY = 30;
@@ -850,10 +850,41 @@
         { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
     ];
 
+    // ================================================================
+    //  📋 الحجوزات الأربعة المضافة يدوياً
+    // ================================================================
+    const initialBookings = [
+        {
+            stage: 'ثانوي',
+            studentName: 'خالد إبراهيم خالد محمود',
+            studentPhone: '01227234406',
+            parentPhone: '01176345234',
+            group: 'مجموعة السبت 4 عصر',
+            timestamp: '١٢:٥٣ م ٢٠٢٨/٨/٣'
+        },
+        {
+            stage: 'ثانوي',
+            studentName: 'حامد سعيد إبراهيم محمد',
+            studentPhone: '01227234406',
+            parentPhone: '012453764849',
+            group: 'مجموعة السبت 4 عصر',
+            timestamp: '١١:٥١ م ٢٠٢٨/٨/٣'
+        },
+        {
+            stage: 'ثانوي',
+            studentName: 'جمال محمد جمال',
+            studentPhone: '01096698116',
+            parentPhone: '01206612721',
+            group: 'مجموعة الأحد 6 مساء',
+            timestamp: '١٢:٥٣ م ٢٠٢٨/٨/٣'
+        }
+    ];
+
     let isSaving = false;
     let lastSyncTime = null;
     let syncErrorCount = 0;
     let syncIntervalId = null;
+    let isFirstLoad = true;
 
     // --------------------- عناصر UI للمزامنة ---------------------
     const syncDot = document.getElementById('syncDot');
@@ -883,12 +914,17 @@
     //  📥 تحميل البيانات من السيرفر
     // ================================================================
     async function loadData() {
+        // تحميل النسخة المحلية كاحتياطي
         try {
             const lg = JSON.parse(localStorage.getItem('bookingGroups') || 'null');
             const lb = JSON.parse(localStorage.getItem('bookingList') || 'null');
             if (Array.isArray(lg) && lg.length) groups = lg;
-            if (Array.isArray(lb)) bookings = lb;
+            if (Array.isArray(lb) && lb.length) bookings = lb;
         } catch (e) {}
+
+        // إذا لم توجد بيانات محلية، استخدم البيانات الأولية
+        if (groups.length === 0) groups = defaultGroups;
+        if (bookings.length === 0) bookings = initialBookings;
 
         if (!JSONBLOB_ID) {
             updateSyncStatus('offline', 'لا يوجد كود قاعدة بيانات');
@@ -910,13 +946,21 @@
             
             const data = await res.json();
             
+            // إذا كانت البيانات من السيرفر فارغة، استخدم البيانات الأولية
             if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
                 groups = data.groups;
             } else {
                 groups = defaultGroups;
             }
             
-            bookings = Array.isArray(data.bookings) ? data.bookings : [];
+            if (data.bookings && Array.isArray(data.bookings) && data.bookings.length > 0) {
+                bookings = data.bookings;
+            } else {
+                bookings = initialBookings;
+                // رفع البيانات الأولية إلى السيرفر
+                await saveData();
+            }
+            
             groups = groups.map(g => ({ ...g, locked: g.locked || false }));
             
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
@@ -1041,6 +1085,7 @@
         refreshFromServer().then((success) => {
             if (success) {
                 console.log('✅ تم التحميل الأولي بنجاح');
+                isFirstLoad = false;
             } else {
                 console.warn('⚠️ فشل التحميل الأولي، سيتم إعادة المحاولة...');
                 setTimeout(() => refreshFromServer(), RETRY_DELAY_MS);
@@ -1474,6 +1519,7 @@
         console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
         console.log('📡 رابط قاعدة البيانات:', getBlobUrl());
         console.log('⏱️  فترة المزامنة:', POLL_INTERVAL_MS / 1000, 'ثواني');
+        console.log('📋 عدد الحجوزات الأولية:', initialBookings.length);
         
         renderGroups();
         renderBookings();
