@@ -823,16 +823,15 @@
     <span class="sync-label">|</span>
     <span class="sync-time" id="syncTime">جاري التحديث...</span>
     <span class="sync-label">|</span>
-    <span class="sync-time" id="syncCount">4 حجوزات</span>
+    <span class="sync-time" id="syncCount">0 حجوزات</span>
 </div>
 
 <script>
     // ================================================================
-    //  🔗 قاعدة البيانات المشتركة - تم التهيئة مسبقاً
-    //  🔑 019fb999-ed4e-7689-bf22-f89a326e0f2c
+    //  🔗 قاعدة البيانات المشتركة - سيتم إنشاؤها تلقائياً
+    //  🔑 سيتم إنشاء كود جديد عند أول حفظ
     // ================================================================
-    const JSONBLOB_ID_FIXED = '019fb999-ed4e-7689-bf22-f89a326e0f2c';
-    let JSONBLOB_ID = JSONBLOB_ID_FIXED || localStorage.getItem('bookingBlobId') || '';
+    let JSONBLOB_ID = localStorage.getItem('bookingBlobId') || '';
     const POLL_INTERVAL_MS = 3000;
     const RETRY_DELAY_MS = 5000;
 
@@ -851,7 +850,7 @@
     ];
 
     // ================================================================
-    //  📋 الحجوزات الأربعة المضافة يدوياً
+    //  📋 الحجوزات الأربعة
     // ================================================================
     const initialBookings = [
         {
@@ -884,7 +883,6 @@
     let lastSyncTime = null;
     let syncErrorCount = 0;
     let syncIntervalId = null;
-    let isFirstLoad = true;
 
     // --------------------- عناصر UI للمزامنة ---------------------
     const syncDot = document.getElementById('syncDot');
@@ -905,6 +903,9 @@
         } else if (status === 'offline') {
             syncDot.className = 'dot red';
             syncText.textContent = '📡 غير متصل';
+        } else if (status === 'creating') {
+            syncDot.className = 'dot yellow';
+            syncText.textContent = '🆕 إنشاء قاعدة...';
         }
         if (message) syncTime.textContent = message;
         syncCount.textContent = bookings.length + ' حجوزات';
@@ -927,7 +928,10 @@
         if (bookings.length === 0) bookings = initialBookings;
 
         if (!JSONBLOB_ID) {
-            updateSyncStatus('offline', 'لا يوجد كود قاعدة بيانات');
+            updateSyncStatus('offline', 'لا يوجد كود - سيتم إنشاؤه عند الحفظ');
+            // عرض البيانات المحلية
+            renderGroups();
+            renderBookings();
             return false;
         }
 
@@ -942,11 +946,17 @@
             });
             clearTimeout(timeoutId);
             
+            if (res.status === 404) {
+                // القاعدة غير موجودة - سنقوم بإنشائها
+                updateSyncStatus('creating', 'قاعدة البيانات غير موجودة، جاري إنشاؤها...');
+                await saveData(); // سيتم إنشاء قاعدة جديدة
+                return true;
+            }
+            
             if (!res.ok) throw new Error('HTTP ' + res.status);
             
             const data = await res.json();
             
-            // إذا كانت البيانات من السيرفر فارغة، استخدم البيانات الأولية
             if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
                 groups = data.groups;
             } else {
@@ -957,7 +967,6 @@
                 bookings = data.bookings;
             } else {
                 bookings = initialBookings;
-                // رفع البيانات الأولية إلى السيرفر
                 await saveData();
             }
             
@@ -985,7 +994,7 @@
     }
 
     // ================================================================
-    //  📤 حفظ البيانات على السيرفر
+    //  📤 حفظ البيانات على السيرفر (مع إنشاء قاعدة جديدة إذا لزم الأمر)
     // ================================================================
     async function saveData() {
         if (isSaving) return;
@@ -994,9 +1003,10 @@
         localStorage.setItem('bookingGroups', JSON.stringify(groups));
         localStorage.setItem('bookingList', JSON.stringify(bookings));
 
+        // إذا لم يوجد كود، أنشئ قاعدة بيانات جديدة
         if (!JSONBLOB_ID) {
             try {
-                updateSyncStatus('syncing', 'إنشاء قاعدة بيانات جديدة...');
+                updateSyncStatus('creating', 'جاري إنشاء قاعدة بيانات جديدة...');
                 const res = await fetch('https://jsonblob.com/api/jsonBlob', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1009,10 +1019,14 @@
                         JSONBLOB_ID = id;
                         localStorage.setItem('bookingBlobId', id);
                         showSetupResult(id);
+                        console.log('✅ تم إنشاء قاعدة بيانات جديدة بالكود:', id);
                     }
+                } else {
+                    throw new Error('فشل إنشاء القاعدة: ' + res.status);
                 }
             } catch (e) {
-                console.error('إنشاء Blob فشل', e);
+                console.error('إنشاء Blob فشل:', e);
+                updateSyncStatus('error', 'فشل إنشاء القاعدة: ' + e.message);
                 isSaving = false;
                 return;
             }
@@ -1028,7 +1042,7 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
             
-            await fetch(getBlobUrl(), {
+            const res = await fetch(getBlobUrl(), {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1038,6 +1052,8 @@
                 signal: controller.signal
             });
             clearTimeout(timeoutId);
+            
+            if (!res.ok) throw new Error('HTTP ' + res.status);
             
             lastSyncTime = new Date();
             syncErrorCount = 0;
@@ -1050,7 +1066,7 @@
             if (err.name === 'AbortError') {
                 updateSyncStatus('error', 'انتهت المهلة في الحفظ');
             } else {
-                updateSyncStatus('error', 'خطأ في الحفظ');
+                updateSyncStatus('error', 'خطأ في الحفظ: ' + err.message);
             }
         }
         isSaving = false;
@@ -1071,24 +1087,30 @@
             renderBookings();
             if (adminModal.classList.contains('active')) renderAdminBookings();
             if (groupsModal.classList.contains('active')) renderGroupsWindow();
+        } else {
+            // إذا فشل التحميل، استخدم البيانات المحلية
+            renderGroups();
+            renderBookings();
         }
         isRefreshing = false;
         return success;
     }
 
     function startSync() {
-        console.log('🔄 بدء المزامنة المستمرة مع قاعدة البيانات...');
-        console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-        console.log('📡 رابط API:', getBlobUrl());
+        console.log('🔄 بدء المزامنة المستمرة...');
+        if (JSONBLOB_ID) {
+            console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
+            console.log('📡 رابط API:', getBlobUrl());
+        } else {
+            console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة عند أول حفظ');
+        }
         updateSyncStatus('syncing', 'جاري الاتصال...');
 
         refreshFromServer().then((success) => {
             if (success) {
                 console.log('✅ تم التحميل الأولي بنجاح');
-                isFirstLoad = false;
             } else {
-                console.warn('⚠️ فشل التحميل الأولي، سيتم إعادة المحاولة...');
-                setTimeout(() => refreshFromServer(), RETRY_DELAY_MS);
+                console.warn('⚠️ جاري استخدام البيانات المحلية');
             }
         });
 
@@ -1104,23 +1126,15 @@
         console.log('✅ المزامنة المستمرة تعمل كل', POLL_INTERVAL_MS / 1000, 'ثواني');
     }
 
-    function restartSyncIfNeeded() {
-        if (!syncIntervalId) {
-            console.log('🔄 إعادة تشغيل المزامنة...');
-            startSync();
-        }
-    }
-
     window.addEventListener('online', function() {
         console.log('🌐 الاتصال بالإنترنت عاد');
         updateSyncStatus('syncing', 'إعادة الاتصال...');
         setTimeout(() => refreshFromServer(), 1000);
-        restartSyncIfNeeded();
     });
 
     window.addEventListener('offline', function() {
         console.log('📡 فقد الاتصال بالإنترنت');
-        updateSyncStatus('offline', 'لا يوجد اتصال');
+        updateSyncStatus('offline', 'لا يوجد اتصال - بيانات محلية');
     });
 
     // --------------------- دوال مساعدة ---------------------
@@ -1163,6 +1177,8 @@
     function showSetupResult(id) {
         setupResultBox.style.display = 'block';
         setupResultInput.value = id;
+        // تنبيه المستخدم
+        alert('✅ تم إنشاء قاعدة بيانات جديدة!\nالكود: ' + id + '\n\nيرجى نسخ الكود وإرساله في الشات.');
     }
 
     // --------------------- عرض المجموعات ---------------------
@@ -1516,8 +1532,11 @@
     // ================================================================
     function init() {
         console.log('🚀 بدء تشغيل دفتر الحجوزات...');
-        console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-        console.log('📡 رابط قاعدة البيانات:', getBlobUrl());
+        if (JSONBLOB_ID) {
+            console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
+        } else {
+            console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة تلقائياً');
+        }
         console.log('⏱️  فترة المزامنة:', POLL_INTERVAL_MS / 1000, 'ثواني');
         console.log('📋 عدد الحجوزات الأولية:', initialBookings.length);
         
@@ -1534,11 +1553,12 @@
         setupDbBtn.addEventListener('click', async function() {
             if (JSONBLOB_ID) { 
                 showSetupResult(JSONBLOB_ID); 
-                alert('✅ قاعدة البيانات مفعلة بالفعل بالكود: ' + JSONBLOB_ID);
                 return; 
             }
             await saveData();
-            if (!JSONBLOB_ID) alert('حصل خطأ أثناء إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
+            if (!JSONBLOB_ID) {
+                alert('❌ فشل إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
+            }
         });
         setupCopyBtn.addEventListener('click', function() {
             setupResultInput.select();
