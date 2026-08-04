@@ -764,6 +764,21 @@
             .btn-primary { font-size: 0.95rem; }
             #syncStatus { font-size: 0.62rem; padding: 5px 10px; }
         }
+    @media print {
+        body * { visibility: hidden; }
+        #printArea, #printArea * { visibility: visible; }
+        #printArea {
+            position: absolute; top: 0; left: 0; width: 100%;
+            padding: 20px; direction: rtl;
+        }
+        #printArea table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        #printArea th, #printArea td {
+            border: 1px solid #333; padding: 6px 8px; text-align: right;
+        }
+        #printArea th { background: #eee; }
+        #printArea h2 { text-align: center; margin-bottom: 4px; }
+        #printArea .print-meta { text-align: center; color: #555; margin-bottom: 16px; font-size: 13px; }
+    }
     </style>
 </head>
 <body>
@@ -873,9 +888,11 @@
         <div id="modalBookingsList"></div>
         <div style="text-align:center; margin-top: 15px;">
             <button class="modal-export-btn" id="exportBtn">📥 تنزيل البيانات (Excel + نص)</button>
+            <button class="modal-export-btn" id="printPdfBtn" style="background:linear-gradient(135deg,#118AB2,#073b4c); margin-inline-start:8px;">🖨️ طباعة كشف الطلاب (PDF)</button>
             <button class="modal-export-btn" id="setupDbBtn" style="background:linear-gradient(135deg,#9B5DE5,#EF476F); margin-inline-start:8px;">🔧 تهيئة قاعدة البيانات المشتركة</button>
             <button class="modal-export-btn" id="forceSyncBtn" style="background:linear-gradient(135deg,#FFD166,#f39c12); margin-inline-start:8px;">🔄 مزامنة فورية</button>
             <button class="modal-export-btn" id="clearLocalBtn" style="background:linear-gradient(135deg,#EF476F,#b0003a); margin-inline-start:8px;">🗑️ مسح البيانات المحلية</button>
+            <button class="modal-export-btn" id="wipeAllBtn" style="background:linear-gradient(135deg,#8b0000,#3d0000); margin-inline-start:8px;">🧨 تفريغ كل الحجوزات نهائيًا</button>
         </div>
         <div id="setupResultBox" style="display:none; margin-top:14px; background:#fff9e6; border:2px solid #FFD166; border-radius:16px; padding:14px 16px; text-align:center;">
             <div style="font-size:0.85rem; font-weight:700; color:#5f2d8a; margin-bottom:8px;">كود قاعدة البيانات - انسخه وابعته في الشات:</div>
@@ -936,24 +953,8 @@
         { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
     ];
 
-    const initialBookings = [
-        {
-            stage: 'ثانوي',
-            studentName: 'خالد إبراهيم خالد محمود',
-            studentPhone: '01176345234',
-            parentPhone: '01227234406',
-            group: 'مجموعة السبت 4 عصر',
-            timestamp: '١٢:٥٣ م ٢٠٢٤/٨/٣'
-        },
-        {
-            stage: 'ثانوي',
-            studentName: 'حامد سعيد إبراهيم محمد',
-            studentPhone: '01238976450',
-            parentPhone: '01238976450',
-            group: 'مجموعة السبت 4 عصر',
-            timestamp: '١١:٥١ م ٢٠٢٤/٨/٣'
-        }
-    ];
+    // ملاحظة: تم حذف بيانات الطلاب التجريبية (initialBookings) نهائيًا من هنا —
+    // كانت السبب في رجوع أسماء بعد مسحها. القاعدة دلوقتي بتبدأ فاضية فعلاً.
 
     let isSaving = false;
     let lastSyncTime = null;
@@ -1025,26 +1026,31 @@
             
             const raw = await res.json();
             
-            // Firebase بيرجع null لو القاعدة لسه فاضية (أول مرة)
+            // Firebase بيرجع null لو القاعدة لسه فاضية (أول مرة على الإطلاق)
             if (raw === null) {
                 updateSyncStatus('creating', 'أول استخدام، جاري تجهيز القاعدة...');
+                groups = defaultGroups;
+                bookings = [];
                 await saveData(false);
                 return true;
             }
             
             const data = raw;
             
-            if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
+            if (data.groups && Array.isArray(data.groups)) {
                 groups = data.groups;
             } else {
                 groups = defaultGroups;
             }
             
-            if (data.bookings && Array.isArray(data.bookings) && data.bookings.length > 0) {
+            // مهم: مصفوفة فاضية معناها "كل الحجوزات اتمسحت فعلاً" — مش معناها "لسه معملناش حاجة".
+            // قبل كده الكود كان بيحط أسماء تجريبية (initialBookings) تلقائيًا كل ما المصفوفة تفضى،
+            // وده اللي كان بيرجّع الأسماء بعد المسح. دلوقتي initialBookings بتتستخدم مرة واحدة بس
+            // عند أول تشغيل للقاعدة (لما raw === null فوق).
+            if (data.bookings && Array.isArray(data.bookings)) {
                 bookings = data.bookings;
             } else {
-                bookings = initialBookings;
-                await saveData();
+                bookings = [];
             }
             
             groups = groups.map(g => ({ ...g, locked: g.locked || false }));
@@ -1080,9 +1086,10 @@
     async function saveData(showStatusMessage = true) {
         if (isSaving) {
             console.log('⚠️ عملية حفظ قيد التنفيذ بالفعل');
-            return;
+            return false;
         }
         isSaving = true;
+        let succeeded = false;
 
         if (showStatusMessage) {
             showSaveStatus('saving', '⏳ جاري حفظ البيانات على السيرفر...');
@@ -1125,6 +1132,7 @@
                 if (showStatusMessage) {
                     showSaveStatus('success', '✅ تم حفظ البيانات على السيرفر (' + bookings.length + ' حجوزات)');
                 }
+                succeeded = true;
             } catch (err) {
                 console.error('تعذر حفظ البيانات:', err);
                 syncErrorCount++;
@@ -1140,6 +1148,7 @@
             }
         }
         isSaving = false;
+        return succeeded;
     }
 
     // ================================================================
@@ -1171,6 +1180,24 @@
             localStorage.removeItem('bookingBlobId');
             alert('✅ تم مسح البيانات المحلية');
             refreshFromServer();
+        }
+    }
+
+    async function clearAllBookingsPermanently() {
+        const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد تفريغ كل الحجوزات نهائيًا من السيرفر:');
+        if (password !== 'admin123') {
+            if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
+            return;
+        }
+        if (!confirm('⚠️⚠️ هل أنت متأكد؟ هذا هيمسح كل الحجوزات نهائيًا من السيرفر (من كل الأجهزة)، ومفيش رجوع بعدها!')) return;
+
+        bookings = [];
+        const ok = await saveData(false);
+        await refreshFromServer();
+        if (ok === true) {
+            alert('✅ تم تفريغ كل الحجوزات نهائيًا من السيرفر.');
+        } else {
+            alert('❌ فشل الحفظ على السيرفر — تأكد إن Firebase Rules مضبوطة على read/write: true ثم حاول تاني.');
         }
     }
 
@@ -1239,12 +1266,14 @@
     const totalCount = document.getElementById('totalCount');
     const groupCount = document.getElementById('groupCount');
     const exportBtn = document.getElementById('exportBtn');
+    const printPdfBtn = document.getElementById('printPdfBtn');
     const setupDbBtn = document.getElementById('setupDbBtn');
     const setupResultBox = document.getElementById('setupResultBox');
     const setupResultInput = document.getElementById('setupResultInput');
     const setupCopyBtn = document.getElementById('setupCopyBtn');
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const clearLocalBtn = document.getElementById('clearLocalBtn');
+    const wipeAllBtn = document.getElementById('wipeAllBtn');
 
     const groupsWindowBtn = document.getElementById('groupsWindowBtn');
     const groupsModal = document.getElementById('groupsModal');
@@ -1610,6 +1639,43 @@
         document.body.style.overflow = '';
     }
 
+    function printStudentsPdf() {
+        if (bookings.length === 0) {
+            alert('📭 لا توجد حجوزات مسجلة للطباعة حاليًا.');
+            return;
+        }
+        const printArea = document.getElementById('printArea');
+        const dateStr = new Date().toLocaleString('ar-EG', { hour12: true });
+        let rows = '';
+        bookings.forEach((b, i) => {
+            rows += `<tr>
+                <td>${i + 1}</td>
+                <td>${b.studentName || ''}</td>
+                <td>${b.stage || ''}</td>
+                <td>${b.group || ''}</td>
+                <td>${b.studentPhone || ''}</td>
+                <td>${b.parentPhone || ''}</td>
+            </tr>`;
+        });
+        printArea.innerHTML = `
+            <h2>كشف الطلاب المسجلين — مستر علاء الحفني</h2>
+            <div class="print-meta">تاريخ الطباعة: ${dateStr} — إجمالي الطلاب: ${bookings.length}</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>اسم الطالب</th>
+                        <th>المرحلة</th>
+                        <th>المجموعة</th>
+                        <th>تليفون الطالب</th>
+                        <th>تليفون ولي الأمر</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+        window.print();
+    }
+
     // --------------------- تصدير البيانات ---------------------
     function exportData() {
         if (bookings.length === 0) {
@@ -1658,6 +1724,7 @@
         modalCloseBtn.addEventListener('click', closeAdminPanel);
         adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
         exportBtn.addEventListener('click', exportData);
+        printPdfBtn.addEventListener('click', printStudentsPdf);
         
         forceSyncBtn.addEventListener('click', async function() {
             await forceSync();
@@ -1665,6 +1732,10 @@
         
         clearLocalBtn.addEventListener('click', function() {
             clearLocalData();
+        });
+
+        wipeAllBtn.addEventListener('click', async function() {
+            await clearAllBookingsPermanently();
         });
         
         setupDbBtn.addEventListener('click', async function() {
@@ -1692,5 +1763,6 @@
     init();
 </script>
 
+    <div id="printArea" style="display:none;"></div>
 </body>
 </html>
