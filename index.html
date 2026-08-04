@@ -909,23 +909,21 @@
 
 <script>
     // ================================================================
-    //  🔗 قاعدة البيانات المشتركة
+    //  🔗 قاعدة البيانات المشتركة — Firebase Realtime Database
     // ================================================================
-    // 🚨 السبب الحقيقي للمشكلة: كل جهاز/متصفح كان يخزن كود قاعدة البيانات
-    // في localStorage الخاص به فقط. فلو الجهاز أو الطالب فتح الرابط ولقى
-    // localStorage فاضي، كان بيعمل قاعدة بيانات جديدة تمامًا لوحده،
-    // فتبقى كل جهة شغالة على "دفتر" منفصل عن التاني.
+    // 🚨 السبب الحقيقي لمشكلة "التزامن بيقف من نفسه": كنا بنستخدم jsonblob.com
+    // وهي خدمة مجانية بتمسح أي قاعدة بيانات مالهاش نشاط لفترة تلقائيًا،
+    // فكانت البيانات بتختفي فجأة من غير أي تدخل من الكود.
     //
-    // الحل النهائي: كود قاعدة البيانات بقى مكتوب ثابت هنا داخل الملف نفسه.
-    // بالتالي أي جهاز أو طالب يفتح نفس هذا الملف/الرابط هيتصل تلقائيًا
-    // بنفس قاعدة البيانات بالظبط، بدون أي اعتماد على localStorage.
-    const SHARED_DB_ID = '019fc71d-5e1f-7535-9b53-f08a2dafe4a7'; // كود قاعدة البيانات الثابت والدائم لكل الأجهزة والطلاب
-    let JSONBLOB_ID = SHARED_DB_ID || localStorage.getItem('bookingBlobId') || '';
+    // الحل الدائم: Firebase Realtime Database (من جوجل) — مجانية ومصممة
+    // فعلاً للاستخدام الدائم والمزامنة اللحظية، وبياناتها مبتتمسحش تلقائيًا.
+    const FIREBASE_URL = 'https://mr-alaa-booking-default-rtdb.firebaseio.com/bookingData.json';
+    let JSONBLOB_ID = 'firebase'; // ثابتة دايمًا الآن — قاعدة البيانات معرّفة داخل الملف نفسه
     const POLL_INTERVAL_MS = 3000;
     const RETRY_DELAY_MS = 5000;
 
     function getBlobUrl() {
-        return JSONBLOB_ID ? ('https://jsonblob.com/api/jsonBlob/' + JSONBLOB_ID) : '';
+        return FIREBASE_URL;
     }
 
     // --------------------- البيانات ---------------------
@@ -1011,11 +1009,6 @@
     //  📥 تحميل البيانات من السيرفر
     // ================================================================
     async function loadData() {
-        if (!JSONBLOB_ID) {
-            updateSyncStatus('offline', 'لا يوجد كود قاعدة بيانات');
-            return false;
-        }
-
         try {
             updateSyncStatus('syncing', 'جاري التحميل...');
             const controller = new AbortController();
@@ -1028,15 +1021,18 @@
             });
             clearTimeout(timeoutId);
             
-            if (res.status === 404) {
-                updateSyncStatus('creating', 'قاعدة البيانات غير موجودة، جاري إنشاؤها...');
-                await saveData();
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            
+            const raw = await res.json();
+            
+            // Firebase بيرجع null لو القاعدة لسه فاضية (أول مرة)
+            if (raw === null) {
+                updateSyncStatus('creating', 'أول استخدام، جاري تجهيز القاعدة...');
+                await saveData(false);
                 return true;
             }
             
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            
-            const data = await res.json();
+            const data = raw;
             
             if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
                 groups = data.groups;
@@ -1097,49 +1093,7 @@
             localStorage.setItem('bookingGroups', JSON.stringify(groups));
             localStorage.setItem('bookingList', JSON.stringify(bookings));
 
-            // إذا لم يوجد كود، أنشئ قاعدة بيانات جديدة
-            if (!JSONBLOB_ID) {
-                try {
-                    updateSyncStatus('creating', 'جاري إنشاء قاعدة بيانات جديدة...');
-                    const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ groups, bookings })
-                    });
-                    if (res.ok) {
-                        const loc = res.headers.get('Location') || res.headers.get('location') || '';
-                        const id = loc.split('/').pop();
-                        if (id) {
-                            JSONBLOB_ID = id;
-                            localStorage.setItem('bookingBlobId', id);
-                            showSetupResult(id);
-                            console.log('✅ تم إنشاء قاعدة بيانات جديدة بالكود:', id);
-                            if (showStatusMessage) {
-                                showSaveStatus('success', '✅ تم إنشاء قاعدة بيانات جديدة! الكود: ' + id);
-                            }
-                            if (!SHARED_DB_ID) {
-                                alert('🆕 تم إنشاء قاعدة بيانات جديدة بكود: ' + id + '\n\n⚠️ مهم: علشان الحل يبقى نهائي، انسخ هذا الكود وابعته لكلود عشان يثبته داخل الملف نفسه. بعدها كل الأجهزة والطلاب هيستخدموا نفس القاعدة تلقائيًا.');
-                            }
-                        }
-                    } else {
-                        throw new Error('فشل إنشاء القاعدة: ' + res.status);
-                    }
-                } catch (e) {
-                    console.error('إنشاء Blob فشل:', e);
-                    if (showStatusMessage) {
-                        showSaveStatus('error', '❌ فشل إنشاء القاعدة: ' + e.message);
-                    }
-                    isSaving = false;
-                    return;
-                }
-            }
-
-            if (!JSONBLOB_ID) {
-                isSaving = false;
-                return;
-            }
-
-            // حفظ على السيرفر - PUT
+            // حفظ على السيرفر - PUT (Firebase بينشئ المسار تلقائيًا لو مش موجود)
             try {
                 updateSyncStatus('syncing', 'جاري الحفظ على السيرفر...');
                 const controller = new AbortController();
@@ -1215,7 +1169,6 @@
             localStorage.removeItem('bookingGroups');
             localStorage.removeItem('bookingList');
             localStorage.removeItem('bookingBlobId');
-            JSONBLOB_ID = '';
             alert('✅ تم مسح البيانات المحلية');
             refreshFromServer();
         }
@@ -1224,12 +1177,7 @@
     function startSync() {
         console.log('🔄 بدء المزامنة المستمرة...');
         console.log('🆔 معرف هذا الجهاز:', deviceId);
-        if (JSONBLOB_ID) {
-            console.log('🔑 كود قاعدة البيانات:', JSONBLOB_ID);
-            console.log('📡 رابط API:', getBlobUrl());
-        } else {
-            console.log('ℹ️  سيتم إنشاء قاعدة بيانات جديدة عند أول حفظ');
-        }
+        console.log('📡 رابط API (Firebase):', getBlobUrl());
         updateSyncStatus('syncing', 'جاري الاتصال...');
 
         refreshFromServer().then((success) => {
@@ -1720,15 +1668,8 @@
         });
         
         setupDbBtn.addEventListener('click', async function() {
-            if (JSONBLOB_ID) { 
-                showSetupResult(JSONBLOB_ID); 
-                alert('✅ قاعدة البيانات مفعلة بالكود: ' + JSONBLOB_ID);
-                return; 
-            }
-            await saveData();
-            if (!JSONBLOB_ID) {
-                alert('❌ فشل إنشاء قاعدة البيانات، تأكد من اتصال الإنترنت وحاول تاني.');
-            }
+            showSetupResult('Firebase (مفعّلة دائمًا)');
+            alert('✅ قاعدة البيانات متصلة بـ Firebase بشكل دائم — مفيش حاجة تحتاج إعداد.');
         });
         setupCopyBtn.addEventListener('click', function() {
             setupResultInput.select();
