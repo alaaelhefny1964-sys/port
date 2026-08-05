@@ -892,7 +892,7 @@
             <button class="modal-export-btn" id="setupDbBtn" style="background:linear-gradient(135deg,#9B5DE5,#EF476F); margin-inline-start:8px;">🔧 تهيئة قاعدة البيانات المشتركة</button>
             <button class="modal-export-btn" id="forceSyncBtn" style="background:linear-gradient(135deg,#FFD166,#f39c12); margin-inline-start:8px;">🔄 مزامنة فورية</button>
             <button class="modal-export-btn" id="clearLocalBtn" style="background:linear-gradient(135deg,#EF476F,#b0003a); margin-inline-start:8px;">🗑️ مسح البيانات المحلية</button>
-            <button class="modal-export-btn" id="wipeAllBtn" style="background:linear-gradient(135deg,#8b0000,#3d0000); margin-inline-start:8px;">🧨 تفريغ كل الحجوزات نهائيًا</button>
+            <button class="modal-export-btn" id="wipeAllBtn" style="background:linear-gradient(135deg,#8b0000,#3d0000); margin-inline-start:8px;">🧨 تفريغ المجموعات والطلاب (تسجيل جديد)</button>
         </div>
         <div id="setupResultBox" style="display:none; margin-top:14px; background:#fff9e6; border:2px solid #FFD166; border-radius:16px; padding:14px 16px; text-align:center;">
             <div style="font-size:0.85rem; font-weight:700; color:#5f2d8a; margin-bottom:8px;">كود قاعدة البيانات - انسخه وابعته في الشات:</div>
@@ -947,11 +947,8 @@
     let groups = [];
     let bookings = [];
     const DEFAULT_CAPACITY = 30;
-    const defaultGroups = [
-        { name: 'مجموعة السبت 4 عصر', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الأحد 6 مساء', capacity: DEFAULT_CAPACITY, locked: false },
-        { name: 'مجموعة الثلاثاء 5 عصر', capacity: DEFAULT_CAPACITY, locked: false }
-    ];
+    // لا توجد مجموعات افتراضية — القاعدة تبدأ فاضية دايمًا، والمدير هو اللي بيضيف المجموعات يدويًا.
+    const defaultGroups = [];
 
     // ملاحظة: تم حذف بيانات الطلاب التجريبية (initialBookings) نهائيًا من هنا —
     // كانت السبب في رجوع أسماء بعد مسحها. القاعدة دلوقتي بتبدأ فاضية فعلاً.
@@ -1184,18 +1181,19 @@
     }
 
     async function clearAllBookingsPermanently() {
-        const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد تفريغ كل الحجوزات نهائيًا من السيرفر:');
+        const password = prompt('🔐 أدخل كلمة مرور المدير لتأكيد تفريغ المجموعات والطلاب نهائيًا من السيرفر (بداية تسجيل جديدة):');
         if (password !== 'admin123') {
             if (password !== null) alert('❌ كلمة المرور غير صحيحة!');
             return;
         }
-        if (!confirm('⚠️⚠️ هل أنت متأكد؟ هذا هيمسح كل الحجوزات نهائيًا من السيرفر (من كل الأجهزة)، ومفيش رجوع بعدها!')) return;
+        if (!confirm('⚠️⚠️ هل أنت متأكد؟ هذا هيمسح كل المجموعات وكل الطلاب المسجلين نهائيًا من السيرفر (من كل الأجهزة)، وهتبدأ التسجيل من جديد تمامًا، ومفيش رجوع بعدها!')) return;
 
+        groups = [];
         bookings = [];
         const ok = await saveData(false);
         await refreshFromServer();
         if (ok === true) {
-            alert('✅ تم تفريغ كل الحجوزات نهائيًا من السيرفر.');
+            alert('✅ تم تفريغ كل المجموعات والطلاب نهائيًا، والبرنامج جاهز يبدأ تسجيل جديد.');
         } else {
             alert('❌ فشل الحفظ على السيرفر — تأكد إن Firebase Rules مضبوطة على read/write: true ثم حاول تاني.');
         }
